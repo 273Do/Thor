@@ -1,5 +1,9 @@
 import pandas as pd
 
+# 日付とwatchデバイス名
+yyyymmdd = "2023-11-14"
+device_name = "irwAW"
+
 # CSVファイルのパス
 csv_file_path = "app/data/SleepAnalysis.csv"
 
@@ -10,7 +14,7 @@ df = pd.read_csv(csv_file_path)
 df["creationDate"] = pd.to_datetime(df["creationDate"])
 
 # 2023-11-14以降のデータをフィルタリング
-filtered_df = df[(df["creationDate"] >= "2023-11-14") & (df["sourceName"] == "irwAW") & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
+filtered_df = df[(df["creationDate"] >= yyyymmdd) & (df["sourceName"] == device_name) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
 
 
 # 出力ファイルのパス

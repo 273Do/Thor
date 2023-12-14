@@ -14,7 +14,7 @@ pandas
 # scikit-learn
 
 # 画像系
-# matplotlib
+matplotlib
 # japanize-matplotlib
 # Pillow
 # opencv-python

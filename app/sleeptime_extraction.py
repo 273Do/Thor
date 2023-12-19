@@ -25,6 +25,3 @@ filtered_df.to_csv(output_csv_path, index=False)
 
 # 結果を表示
 # print(filtered_df)
-
-# 可視化よう関数を追加
-# TODO:同じファイルにするのかどうか検討

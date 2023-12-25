@@ -48,7 +48,7 @@ plt.yticks(fontsize=8)
 plt.title('Sleep Time Heatmap')
 
 # x軸の目盛りを設定
-time_labels = np.arange(0, 288, 12*12)  # 12時間ごとに目盛りを表示
+time_labels = np.arange(0, 288, 6*12)  # 12時間ごとに目盛りを表示
 plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
 
 # 日付を表示

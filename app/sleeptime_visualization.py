@@ -61,7 +61,7 @@ cbar.set_ticklabels(['No Sleep', 'Sleep'])
 cbar.set_label('Sleep Status')
 
 # グラフを保存
-plt.savefig("app/extraction_data/sleep_heatmap_re.png")
+plt.savefig("app/extraction_data/sleep_heatmap.png")
 
 # ヒートマップを作成
 # heatmap = plt.imshow(data, cmap='viridis', interpolation='nearest')

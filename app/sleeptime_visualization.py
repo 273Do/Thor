@@ -13,8 +13,8 @@ df = pd.read_csv(csv_file_path)
 
 # 日付とwatchデバイス名
 yyyymmdd = "2023-11-14"
-# device_name = df["sourceName"][0]
-device_name = "irwAW"
+device_name = df["sourceName"][0]
+# device_name = "name"
 
 
 print(device_name)
@@ -61,7 +61,7 @@ cbar.set_ticklabels(['No Sleep', 'Sleep'])
 cbar.set_label('Sleep Status')
 
 # グラフを保存
-plt.savefig("app/extraction_data/sleep_heatmap.png")
+plt.savefig("app/extraction_data/sleep_heatmap_3.png")
 
 # ヒートマップを作成
 # heatmap = plt.imshow(data, cmap='viridis', interpolation='nearest')

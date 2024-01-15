@@ -53,3 +53,5 @@ cbar.set_label('Measured Step')
 
 # グラフを保存
 plt.savefig("app/extraction_data/step_heatmap_31.png")
+
+#歩数，睡眠抽出のコードは一部似ているので，関数として統合します．

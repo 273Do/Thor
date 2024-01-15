@@ -53,4 +53,4 @@ cbar.set_label('Sleep Status')
 
 
 # グラフを保存
-plt.savefig("app/extraction_data/sleep_heatmap_31.png")
+plt.savefig("app/extraction_data/sleep_heatmap.png")

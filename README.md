@@ -20,4 +20,4 @@ Contains no personal data．
 
 8. The results will be output to `extraction_data` folders.
 
-10. To exit, run ```exit``` in the terminal and run ```docker-compose down```.
+10. To exit, run ```exit``` in the terminal and run ```docker compose down```.

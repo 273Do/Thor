@@ -16,7 +16,7 @@ Contains no personal data．
 
 6. Next, move to the `app` directory and run ```python3 applehealthdata.py data/export.xml```.
 
-7. Finally, run ```pyrhon3 main.py```.
+7. Finally, run ```python3 main.py```.
 
 8. The results will be output to `extraction_data` folders.
 

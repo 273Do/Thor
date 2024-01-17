@@ -52,4 +52,4 @@ cbar.set_ticklabels(['No Step', 'Step'])
 cbar.set_label('Measured Step')
 
 # グラフを保存
-plt.savefig("app/extraction_data/step_heatmap.png")
+plt.savefig("app/extraction_data/step_heatmap_31.png")

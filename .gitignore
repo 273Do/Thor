@@ -1,5 +1,5 @@
 .DS_Store
 
 app/data/
-
 app/extraction_data/
+app/src/__pycache__/

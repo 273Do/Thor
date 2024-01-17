@@ -1,0 +1,38 @@
+{
+  "sleep": {
+    "mode_name": "sleep",
+    "metadata": {
+      "csv_file_path": "data/SleepAnalysis.csv",
+      "start_date": "2023-12-01",
+      "end_date": "2024-01-01",
+      "image_name": "extraction_data/sleep_heatmap"
+    },
+    "heatmap": {
+      "title": "Sleep Time Heatmap",
+      "x_label": "Time (5-minute intervals)",
+      "y_label": "Date"
+    },
+    "color_bar": {
+      "tick_labels": ["No Sleep", "Sleep"],
+      "label": "Measured Step"
+    }
+  },
+  "step": {
+    "mode_name": "step",
+    "metadata": {
+      "csv_file_path": "data/StepCount.csv",
+      "start_date": "2023-12-01",
+      "end_date": "2024-01-01",
+      "image_name": "extraction_data/step_heatmap"
+    },
+    "heatmap": {
+      "title": "Step Time Heatmap",
+      "x_label": "Time (5-minute intervals)",
+      "y_label": "Date"
+    },
+    "color_bar": {
+      "tick_labels": ["No Step", "Step"],
+      "label": "Sleep Status"
+    }
+  }
+}

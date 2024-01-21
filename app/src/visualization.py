@@ -3,17 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
 
-# 引数は以下の通りで，オブジェクトしてまとめる
-# mode, metadata，heatmap，colorbar
-# metadata:csv_file_path, start_date, end_date, device_name, image_name, heatmap_config
-# heatmap:title．x_label, y_label
-# colorbar:ticklabels(二次元)，label
-
-# device_name
-# mode
-
 # データ可視化用の関数
-def data_visualization(mode):
+def data_visualization(mode, wake_up_time, sleep_time ):
     
     # CSVファイルを読み込む
     df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)

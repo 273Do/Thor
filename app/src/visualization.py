@@ -2,24 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
-
-# 引数は以下の通りで，オブジェクトしてまとめる
-# mode, metadata，heatmap，colorbar
-# metadata:csv_file_path, start_date, end_date, device_name, image_name, heatmap_config
-# heatmap:title．x_label, y_label
-# colorbar:ticklabels(二次元)，label
-
-# device_name
-# mode
+from datetime import datetime, time
 
 # データ可視化用の関数
-def data_visualization(mode):
+def data_visualization(mode, file_name):
     
     # CSVファイルを読み込む
     df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)
     
     # 指定の日付範囲でフィルタリング
-    df = df[(df["creationDate"] >= mode["metadata"]["start_date"]) & (df["creationDate"] <= mode["metadata"]["end_date"])]
+    df = df[(df["startDate"] >= mode["metadata"]["start_date"]) & (df["endDate"] <= mode["metadata"]["end_date"])]
+    
+    # "startDate" と "endDate" の列を datetime 型に変換
+    df['startDate'] = pd.to_datetime(df['startDate'])
+    df['endDate'] = pd.to_datetime(df['endDate'])
     
     # 抽出対象を指定してフィルタリング
     if(mode["mode_name"] == "sleep"):
@@ -29,10 +25,6 @@ def data_visualization(mode):
         df = df[(df["sourceName"] == device_name) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
     elif(mode["mode_name"]  == "step"):
         df = df[df["device"].str.contains("name:iPhone")]
-
-    # "startDate" と "endDate" の列を datetime 型に変換
-    df['startDate'] = pd.to_datetime(df['startDate'])
-    df['endDate'] = pd.to_datetime(df['endDate'])
     
     # ヒートマップ用のデータを初期化
     unique_dates = df['startDate'].dt.date.unique()
@@ -66,4 +58,4 @@ def data_visualization(mode):
     cbar.set_label(mode["color_bar"]["label"])
     
     # グラフを保存
-    plt.savefig(mode["metadata"]["image_name"])
+    plt.savefig(mode["metadata"]["image_name"] + "_" + file_name)

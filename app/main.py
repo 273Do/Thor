@@ -7,5 +7,5 @@ json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
 
 # 実行
-# data_visualization(mode["sleep"], "test")
+data_visualization(mode["sleep"], "test")
 data_visualization(mode["step"], "sleepTest3",)

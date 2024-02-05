@@ -1,5 +1,5 @@
 # MyResearch
-I am incorporating [**applehealthdata**](https://github.com/tdda/applehealthdata) as part of our research.
+I am incorporating [**applehealthdata**](https://github.com/tdda/applehealthdata) as part of my research.
 Contains no personal data．
 
 ## How to Use

@@ -8,6 +8,7 @@ json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
 
 # 実行
+
 # dataVisualization(mode["sleep"], "test")
 # dataVisualization(mode["step"], "sleepTest3")
 estimateSleepFromStep(mode["estimate_sleep_from_step"], [2,10.5,2,3], "test")

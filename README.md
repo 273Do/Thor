@@ -1,3 +1,5 @@
+
+
 # MyResearch
 I am incorporating [**applehealthdata**](https://github.com/tdda/applehealthdata) as part of our research.
 Contains no personal data．
@@ -21,3 +23,22 @@ Contains no personal data．
 8. The results will be output to `extraction_data` folders.
 
 10. To exit, run ```exit``` in the terminal and run ```docker compose down```.
+
+## About Functions
+
+### This function allows you to visualize your sleep time and step count.
+```python
+dataVisualization(mode, file_name)
+```
+- first argument：Specifying the mode. You can change settings from `settings.json`.
+- second argument：File name of the image to output.
+<hr>
+
+### This is a function that estimates sleep time from the number of steps.
+```python
+estimateSleepFromStep(mode, [a, b, c, d], file_name)
+```
+- first argument：Specifying the mode. You can change settings from `settings.json`.
+- second argument：array with time set．Please set as below.  
+`[bed_time_average, wake_time_average, bed_time_threshold, wake_time_threshold]`
+- third argument：File name of the image to output.

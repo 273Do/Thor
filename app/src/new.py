@@ -9,10 +9,16 @@ csv_file_path = "data/StepCount.csv"
 # CSVファイルを読み込む
 df = pd.read_csv(csv_file_path, dtype={"sourceVersion": str, "device": str}, low_memory=False)
 
+# デバイス名が記述されたテキストファイルを読み込む
+f = open('src/device_name.txt', 'r', encoding='UTF-8')
+data = f.read()
+print(data)
+
+
 # 日付とwatchデバイス名
 start_yyyymmdd = "2023-12-01"
 end_yyyymmdd = "2024-01-01"
-device_name = "TSIPXIIIM"
+device_name = data
 
 # 2023-11-14以降のデータをフィルタリング
 df = df[(df["creationDate"] >= start_yyyymmdd) & (df["creationDate"] <= end_yyyymmdd) & (df["sourceName"] == device_name) ]
@@ -32,8 +38,8 @@ def ConvertToHeatmapCompatible(time):
 
 bed_time_average = ConvertToHeatmapCompatible(2) # 02:00 24
 wake_time_average = ConvertToHeatmapCompatible(10.5) # 10:30 126 
-bed_time_threshold = ConvertToHeatmapCompatible(1.5) # 30分 6
-wake_time_threshold = ConvertToHeatmapCompatible(0.25) # 30分 6
+bed_time_threshold = ConvertToHeatmapCompatible(2) # 30分 6
+wake_time_threshold = ConvertToHeatmapCompatible(3) # 30分 6
 
 
 
@@ -41,42 +47,29 @@ wake_time_threshold = ConvertToHeatmapCompatible(0.25) # 30分 6
 # 各行に対して、startDate から endDate の範囲を1に設定
 for i, date in enumerate(unique_dates):
     date_data = df[df['startDate'].dt.date == date]
-    # print(date_data)
+    print(date_data)
     set_bed_time = False
     set_wake_time = False
+    estimate_index_array = [[],[]]
     for _, row in date_data.iterrows():
         start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
         end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-        print(start_index,end_index)
+        # print(start_index,end_index)
+        
         if((abs(end_index - bed_time_average) < bed_time_threshold)):
-            heatmap_data[i, start_index:end_index + 1] = 1
+            estimate_index_array[0].append(end_index)
             set_bed_time = True
-        elif(set_bed_time == False): heatmap_data[i, bed_time_average:bed_time_average + 1] = 1
+        elif(set_bed_time == False):
+            estimate_index_array[0].append(bed_time_average)
         if((abs(start_index - wake_time_average) < wake_time_threshold)):
-            heatmap_data[i, start_index:end_index + 1] = 1
+            estimate_index_array[1].append(start_index)
             set_wake_time = True
-        elif(set_wake_time == False): heatmap_data[i, wake_time_average:wake_time_average + 1] = 1
-    # if(set_bed_time and set_wake_time):
-            # heatmap_data[i, bed_time_average:wake_time_average + 1] = 1
+        elif(set_wake_time == False):
+            estimate_index_array[1].append(wake_time_average)
+    print(estimate_index_array)
+    heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1]) + 1] = 1
         
     print("----day:",row['startDate'].day,"----")
-
-# 繋げる場合
-# grouped_df = df.groupby(df['startDate'].dt.date).agg({'startDate': 'min', 'endDate': 'max'})
-# for i, (_, row) in enumerate(grouped_df.iterrows()):
-#     start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
-#     end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-#     heatmap_data[i, start_index:end_index + 1] = 1
-#     print(start_index,end_index)
-#     print("----day:",row['startDate'].day,"----")
-#     # if(abs(start_index - bed_time_average) > bed_time_threshold):
-#     #     start_index = bed_time_average
-#     # elif(abs(start_index - wake_time_average) > wake_time_threshold):
-#     #     end_index = wake_time_average
-#     # if(abs(end_index - wake_time_average) > wake_time_threshold):
-#     #     end_index = wake_time_average
-#     heatmap_data[i, start_index:end_index + 1] = 1
-#     # heatmap_data[i, sleep_time_average:wake_time_average] = 1
 
 # ヒートマップの描画
 plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')
@@ -93,8 +86,8 @@ plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
 
 # カラーバーを表示
 cbar = plt.colorbar(ticks=[0, 1])
-cbar.set_ticklabels(['No Step', 'Step'])
-cbar.set_label('Measured Step')
+cbar.set_ticklabels(['No Sleep', 'Sleep'])
+cbar.set_label('Estimate Sleep')
 
 # グラフを保存
 plt.savefig("extraction_data/estimation_sleep_heatmap.png")

@@ -7,6 +7,7 @@ jupyterlab
 # 分析系
 pandas
 numpy
+pyarrow
 # scipy
 # xlrd
 # XlsxWriter

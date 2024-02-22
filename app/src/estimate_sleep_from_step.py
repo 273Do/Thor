@@ -2,10 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap 
-
+    
 # 時間をヒートマップの形式に対応するように変換する関数
-def ConvertToHeatmapCompatible(time):
-    return int(288 * time / 24)
+ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 
 # 歩数から睡眠を推定する関数
 def estimateSleepFromStep(mode,time_specified_data,file_name):

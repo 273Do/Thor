@@ -5,6 +5,8 @@ Contains no personal data．
 
 ## How to Use
 
+0. Export your healthcare information from your iPhone.
+
 1. Please install Docker.
 
 2. Clone the repository to any directory.

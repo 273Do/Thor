@@ -3,3 +3,4 @@
 app/data/
 app/extraction_data/
 app/src/__pycache__/
+app/src/device_name.txt

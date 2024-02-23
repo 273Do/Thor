@@ -1,13 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap 
+    
+# 時間をヒートマップの形式に対応するように変換する関数
+ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 
-# データ可視化用の関数
-def dataVisualization(mode, file_name):
+# 歩数から睡眠を推定する関数
+def estimateSleepFromStep(mode,time_specified_data,file_name):
+    
+    bed_time_average = ConvertToHeatmapCompatible(time_specified_data[0])
+    wake_time_average = ConvertToHeatmapCompatible(time_specified_data[1])
+    bed_time_threshold = ConvertToHeatmapCompatible(time_specified_data[2])
+    wake_time_threshold = ConvertToHeatmapCompatible(time_specified_data[3])
     
     # CSVファイルを読み込む
-    df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)
+    df = pd.read_csv(mode["metadata"]["csv_file_path"], dtype={"sourceVersion": str, "device": str}, low_memory=False)
     
     # 指定の日付範囲でフィルタリング
     df = df[(df["startDate"] >= mode["metadata"]["start_date"]) & (df["endDate"] <= mode["metadata"]["end_date"])]
@@ -17,26 +25,40 @@ def dataVisualization(mode, file_name):
     df['endDate'] = pd.to_datetime(df['endDate'])
     
     # 抽出対象を指定してフィルタリング
-    if(mode["mode_name"] == "sleep"):
-        # デバイス名を取得
-        device_name = df["sourceName"].mode()[0]
-        print("sleepデバイス名：" + device_name)
-        df = df[(df["sourceName"] == device_name) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
-    elif(mode["mode_name"]  == "step"):
-        df = df[df["device"].str.contains("name:iPhone")]
+    df = df[df["device"].str.contains("name:iPhone")]
     
     # ヒートマップ用のデータを初期化
     unique_dates = df['startDate'].dt.date.unique()
-    heatmap_data = np.zeros((len(unique_dates), 288))  # 288：24時間 x 60分 / 5分刻み
+    heatmap_data = np.zeros((len(unique_dates), 288))  # 288は24時間 x 60分 / 5分刻み
     
     # 各行に対して、startDate から endDate の範囲を1に設定
+    # 推定するアルゴリズムを実装
     for i, date in enumerate(unique_dates):
         date_data = df[df['startDate'].dt.date == date]
+        # print(date_data)
+        set_bed_time = False
+        set_wake_time = False
+        estimate_index_array = [[],[]]
         for _, row in date_data.iterrows():
             start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
             end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-            heatmap_data[i, start_index:end_index + 1] = 1
-            
+            # print(start_index,end_index)
+        
+            if((abs(end_index - bed_time_average) < bed_time_threshold)):
+                estimate_index_array[0].append(end_index)
+                set_bed_time = True
+            elif(set_bed_time == False):
+                estimate_index_array[0].append(bed_time_average)
+            if((abs(start_index - wake_time_average) < wake_time_threshold)):
+                estimate_index_array[1].append(start_index)
+                set_wake_time = True
+            elif(set_wake_time == False):
+                estimate_index_array[1].append(wake_time_average)
+        # print(estimate_index_array)
+        heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1]) + 1] = 1
+        
+        # print("----day:",row['startDate'].day,"----")
+        
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
     plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')

@@ -9,6 +9,12 @@ ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 # 歩数から睡眠を推定する関数
 def estimateSleepFromStep(mode,time_specified_data,file_name):
     
+    is_cross_day = False
+    
+    if(12 < time_specified_data[0] <= 24):
+        is_cross_day = True
+    print(is_cross_day)
+    
     bed_time_average = ConvertToHeatmapCompatible(time_specified_data[0])
     wake_time_average = ConvertToHeatmapCompatible(time_specified_data[1])
     bed_time_threshold = ConvertToHeatmapCompatible(time_specified_data[2])
@@ -38,11 +44,12 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
         # print(date_data)
         set_bed_time = False
         set_wake_time = False
-        estimate_index_array = [[],[]]
+        estimate_index_array = [[], []]
+        
         for _, row in date_data.iterrows():
             start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
             end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-            # print(start_index,end_index)
+            print(i,start_index, end_index)
         
             if((abs(end_index - bed_time_average) < bed_time_threshold)):
                 estimate_index_array[0].append(end_index)
@@ -54,8 +61,12 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
                 set_wake_time = True
             elif(set_wake_time == False):
                 estimate_index_array[1].append(wake_time_average)
-        # print(estimate_index_array)
-        heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1]) + 1] = 1
+                
+        if(is_cross_day == True):
+            heatmap_data[i, max(estimate_index_array[0]):288] = 1
+            heatmap_data[i, 0:min(estimate_index_array[1])] = 1
+        else:
+            heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1])] = 1
         
         # print("----day:",row['startDate'].day,"----")
         

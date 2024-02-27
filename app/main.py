@@ -11,5 +11,5 @@ mode = json.load(json_open)
 
 # dataVisualization(mode["sleep"], "test")
 # dataVisualization(mode["step"], "Re")
-# estimateSleepFromStep(mode["estimate_sleep_from_step"], [2,10.5,2,3], "test")
-estimateSleepFromStep(mode["estimate_sleep_from_step"], [22,10.5,2,3], "Re")
+# estimateSleepFromStep(mode["estimate_sleep_from_step"], [2, 10.5, 2, 3], "test")
+estimateSleepFromStep(mode["estimate_sleep_from_step"], [22, 10.5, "-", "-"], "Re")

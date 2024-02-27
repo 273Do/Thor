@@ -13,12 +13,18 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
     
     if(12 < time_specified_data[0] <= 24):
         is_cross_day = True
-    print(is_cross_day)
     
     bed_time_average = ConvertToHeatmapCompatible(time_specified_data[0])
     wake_time_average = ConvertToHeatmapCompatible(time_specified_data[1])
-    bed_time_threshold = ConvertToHeatmapCompatible(time_specified_data[2])
-    wake_time_threshold = ConvertToHeatmapCompatible(time_specified_data[3])
+    
+    if(time_specified_data[2] == "-"):
+        bed_time_threshold = 24
+    else:
+        bed_time_threshold = ConvertToHeatmapCompatible(time_specified_data[2])
+    if(time_specified_data[3] == "-"):
+        wake_time_threshold = 24
+    else:
+        wake_time_threshold = ConvertToHeatmapCompatible(time_specified_data[3])
     
     # CSVファイルを読み込む
     df = pd.read_csv(mode["metadata"]["csv_file_path"], dtype={"sourceVersion": str, "device": str}, low_memory=False)
@@ -49,7 +55,7 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
         for _, row in date_data.iterrows():
             start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
             end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-            print(i,start_index, end_index)
+            # print(i,start_index, end_index)
         
             if((abs(end_index - bed_time_average) < bed_time_threshold)):
                 estimate_index_array[0].append(end_index)

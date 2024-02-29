@@ -20,7 +20,7 @@
   "step": {
     "mode_name": "step",
     "metadata": {
-      "csv_file_path": "data/StepCount2.csv",
+      "csv_file_path": "data/StepCount.csv",
       "start_date": "2023-12-01",
       "end_date": "2024-01-01",
       "image_name": "extraction_data/step_heatmap"

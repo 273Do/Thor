@@ -9,10 +9,10 @@ ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 # 歩数から睡眠を推定する関数
 def estimateSleepFromStep(mode,time_specified_data,file_name):
     
-    is_cross_day = False
+    is_cross_day = True
     
     if(12 < time_specified_data[0] <= 24):
-        is_cross_day = True
+        is_cross_day = False
     
     bed_time_average = ConvertToHeatmapCompatible(time_specified_data[0])
     wake_time_average = ConvertToHeatmapCompatible(time_specified_data[1])
@@ -67,8 +67,9 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
                 set_wake_time = True
             elif(set_wake_time == False):
                 estimate_index_array[1].append(wake_time_average)
-                
-        if(is_cross_day == True):
+        
+        # 平均就寝時間が24時を超えない場合とそうでない場合
+        if(is_cross_day == False):
             heatmap_data[i, max(estimate_index_array[0]):288] = 1
             heatmap_data[i, 0:min(estimate_index_array[1])] = 1
         else:
@@ -87,7 +88,7 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
     plt.yticks(range(len(unique_dates)), [date.strftime('%Y-%m-%d') for date in unique_dates], fontsize=8)
     
     # x軸の目盛りを設定
-    time_labels = np.arange(0, 288, 6*12)  # 6時間ごとに目盛りを表示
+    time_labels = np.arange(0, 289, 6*12)  # 6時間ごとに目盛りを表示
     plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
     
     # カラーバーを表示

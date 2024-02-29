@@ -48,7 +48,7 @@ def dataVisualization(mode, file_name):
     plt.yticks(range(len(unique_dates)), [date.strftime('%Y-%m-%d') for date in unique_dates], fontsize=8)
     
     # x軸の目盛りを設定
-    time_labels = np.arange(0, 288, 6*12)  # 6時間ごとに目盛りを表示
+    time_labels = np.arange(0, 289, 6*12)  # 6時間ごとに目盛りを表示
     plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
     
     # カラーバーを表示

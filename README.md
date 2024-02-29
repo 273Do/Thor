@@ -44,7 +44,7 @@ estimateSleepFromStep(mode, [a, b, c, d], file_name)
 ```
 
 - first argument：Specifying the mode. You can change settings from `settings.json`.
-- second argument：array with time set．Please set as below.  
+- second argument：array with time set．Please set as below. If you add "-" to the threshold value, it becomes the default value (2 hours).
   `[bed_time_average, wake_time_average, bed_time_threshold, wake_time_threshold]`
 - third argument：File name of the image to output.
 

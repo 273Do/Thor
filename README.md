@@ -44,9 +44,10 @@ estimateSleepFromStep(mode, [a, b, c, d], file_name)
 ```
 
 - first argument：Specifying the mode. You can change settings from `settings.json`.
-- second argument：array with time set．Please set as below. If you add "-" to the threshold value, it becomes the default value (2 hours).
-  `[bed_time_average, wake_time_average, bed_time_threshold, wake_time_threshold]`
-- third argument：File name of the image to output.
+- second argument：Array with time set．Please set as below. If you add "-" to the threshold value, it becomes the default value (2 hours).
+  `[bed_time_average, wake_time_average, bed_time_threshold, step_observation_threshold, wake_time_threshold]`
+- third argument：If the time between a step and the next observed step is more than **N hours**, skip the values for that day. Please enter a value between 9 and 24 hours.
+- Fourth argument：File name of the image to output.
 
 > - Supports those whose bedtime is after 00:00. It will not work if it is before the day has passed.
 > - This does not take into account cases where you wake up in the middle of the day (this will be supported in the future).

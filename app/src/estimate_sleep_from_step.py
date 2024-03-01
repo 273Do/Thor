@@ -7,9 +7,12 @@ from matplotlib.colors import ListedColormap
 ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 
 # 歩数から睡眠を推定する関数
-def estimateSleepFromStep(mode,time_specified_data,file_name):
+def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold, file_name):
     
+    # 日を跨ぐかどうか
     is_cross_day = True
+    
+    # ステップ観測閾値が9~24の間であるかどうかを判断する必要があるか？
     
     if(12 < time_specified_data[0] <= 24):
         is_cross_day = False
@@ -42,7 +45,7 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
     # ヒートマップ用のデータを初期化
     unique_dates = df['startDate'].dt.date.unique().tolist()
     heatmap_data = np.zeros((len(unique_dates), 288))  # 288は24時間 x 60分 / 5分刻み
-    # 各行に対して、startDate から endDate の範囲を1に設定
+    
     # 推定するアルゴリズムを実装
     for i, date in enumerate(unique_dates):
         date_data = df[df['startDate'].dt.date == date]
@@ -55,7 +58,7 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
         for _, row in date_data.iterrows():
             start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
             end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-            if(start_index - end_tmp > ConvertToHeatmapCompatible(15)):
+            if(start_index - end_tmp > ConvertToHeatmapCompatible(step_observation_threshold)):#9_15
                 is_skip = True
                 # print(row["startDate"].strftime("%Y-%m-%d"), unique_dates[i])
                 # unique_dates.remove(row["startDate"].strftime("%Y-%m-%d"))
@@ -76,9 +79,11 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
                 elif(set_wake_time == False):
                     estimate_index_array[1].append(wake_time_average)
             end_tmp = end_index
-            
+          
+        # 日をスキップしない場合はヒートマップ用のデータを更新  
         if(is_skip == False):
             # 平均就寝時間が24時を超えない場合とそうでない場合
+            # 各行に対して、startDate から endDate の範囲を1に設定
             if(is_cross_day == False):
                 heatmap_data[i, max(estimate_index_array[0]):288] = 1
                 heatmap_data[i, 0:min(estimate_index_array[1])] = 1

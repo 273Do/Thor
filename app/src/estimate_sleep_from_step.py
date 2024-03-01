@@ -18,11 +18,11 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
     wake_time_average = ConvertToHeatmapCompatible(time_specified_data[1])
     
     if(time_specified_data[2] == "-"):
-        bed_time_threshold = 24
+        bed_time_threshold = ConvertToHeatmapCompatible(2)
     else:
         bed_time_threshold = ConvertToHeatmapCompatible(time_specified_data[2])
     if(time_specified_data[3] == "-"):
-        wake_time_threshold = 24
+        wake_time_threshold = ConvertToHeatmapCompatible(2)
     else:
         wake_time_threshold = ConvertToHeatmapCompatible(time_specified_data[3])
     
@@ -40,43 +40,51 @@ def estimateSleepFromStep(mode,time_specified_data,file_name):
     df = df[df["device"].str.contains("name:iPhone")]
     
     # ヒートマップ用のデータを初期化
-    unique_dates = df['startDate'].dt.date.unique()
+    unique_dates = df['startDate'].dt.date.unique().tolist()
     heatmap_data = np.zeros((len(unique_dates), 288))  # 288は24時間 x 60分 / 5分刻み
-    
     # 各行に対して、startDate から endDate の範囲を1に設定
     # 推定するアルゴリズムを実装
     for i, date in enumerate(unique_dates):
         date_data = df[df['startDate'].dt.date == date]
-        # print(date_data)
         set_bed_time = False
         set_wake_time = False
+        is_skip = False
+        end_tmp = 0
         estimate_index_array = [[], []]
         
         for _, row in date_data.iterrows():
             start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
             end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-            # print(i,start_index, end_index)
-        
-            if((abs(end_index - bed_time_average) < bed_time_threshold)):
-                estimate_index_array[0].append(end_index)
-                set_bed_time = True
-            elif(set_bed_time == False):
-                estimate_index_array[0].append(bed_time_average)
-            if((abs(start_index - wake_time_average) < wake_time_threshold)):
-                estimate_index_array[1].append(start_index)
-                set_wake_time = True
-            elif(set_wake_time == False):
-                estimate_index_array[1].append(wake_time_average)
-        
-        # 平均就寝時間が24時を超えない場合とそうでない場合
-        if(is_cross_day == False):
-            heatmap_data[i, max(estimate_index_array[0]):288] = 1
-            heatmap_data[i, 0:min(estimate_index_array[1])] = 1
-        else:
-            heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1])] = 1
-        
-        # print("----day:",row['startDate'].day,"----")
-        
+            if(start_index - end_tmp > ConvertToHeatmapCompatible(15)):
+                is_skip = True
+                # print(row["startDate"].strftime("%Y-%m-%d"), unique_dates[i])
+                # unique_dates.remove(row["startDate"].strftime("%Y-%m-%d"))
+                # 日にちを消す処理をしたい
+                # delete_date_index.append(unique_dates[i])
+                # del unique_dates[i]
+                break
+            else:
+                is_skip = False
+                if((abs(end_index - bed_time_average) < bed_time_threshold)):
+                    estimate_index_array[0].append(end_index)
+                    set_bed_time = True
+                elif(set_bed_time == False):
+                    estimate_index_array[0].append(bed_time_average)
+                if((abs(start_index - wake_time_average) < wake_time_threshold)):
+                    estimate_index_array[1].append(start_index)
+                    set_wake_time = True
+                elif(set_wake_time == False):
+                    estimate_index_array[1].append(wake_time_average)
+            end_tmp = end_index
+            
+        if(is_skip == False):
+            # 平均就寝時間が24時を超えない場合とそうでない場合
+            if(is_cross_day == False):
+                heatmap_data[i, max(estimate_index_array[0]):288] = 1
+                heatmap_data[i, 0:min(estimate_index_array[1])] = 1
+            else:
+                heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1])] = 1
+
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
     plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')

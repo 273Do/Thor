@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -5,12 +6,16 @@ from matplotlib.colors import ListedColormap
 
 # データ可視化用の関数
 def dataVisualization(mode, file_name):
+
+    # 時間の設定を読み込む
+    json_open = open('./src/settings.json', 'r')
+    time = json.load(json_open)
     
     # CSVファイルを読み込む
     df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)
     
     # 指定の日付範囲でフィルタリング
-    df = df[(df["startDate"] >= mode["metadata"]["start_date"]) & (df["endDate"] <= mode["metadata"]["end_date"])]
+    df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]
     
     # "startDate" と "endDate" の列を datetime 型に変換
     df['startDate'] = pd.to_datetime(df['startDate'])

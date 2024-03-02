@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,6 +9,10 @@ ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 
 # 歩数から睡眠を推定する関数
 def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold, file_name):
+    
+    # 時間の設定を読み込む
+    json_open = open('./src/settings.json', 'r')
+    time = json.load(json_open)
     
     # 日を跨ぐかどうか
     is_cross_day = True
@@ -33,7 +38,7 @@ def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold,
     df = pd.read_csv(mode["metadata"]["csv_file_path"], dtype={"sourceVersion": str, "device": str}, low_memory=False)
     
     # 指定の日付範囲でフィルタリング
-    df = df[(df["startDate"] >= mode["metadata"]["start_date"]) & (df["endDate"] <= mode["metadata"]["end_date"])]
+    df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]
     
     # "startDate" と "endDate" の列を datetime 型に変換
     df['startDate'] = pd.to_datetime(df['startDate'])

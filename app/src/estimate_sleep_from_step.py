@@ -101,6 +101,7 @@ def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold,
 
     # タイトル，軸の設定
     plt.title(mode["heatmap"]["title"])
+    plt.text(260, -1, f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}", fontsize=7)
     plt.xlabel(mode["heatmap"]["x_label"])
     plt.ylabel(mode["heatmap"]["y_label"])
     plt.yticks(range(len(unique_dates)), [date.strftime('%Y-%m-%d') for date in unique_dates], fontsize=8)

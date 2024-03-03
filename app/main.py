@@ -9,10 +9,10 @@ mode = json.load(json_open)
 
 # 実行
 
-dataVisualization(mode["sleep"], "test")
-dataVisualization(mode["step"], "test")
+# dataVisualization(mode["sleep"], "t04")
+# dataVisualization(mode["step"], "t04")
 # estimateSleepFromStep(mode["estimate_sleep_from_step"], [2, 10.5, 2, 3], 15, "test")
-estimateSleepFromStep(mode["estimate_sleep_from_step"], [0.5, 8.5, "-", "-"], 9, "test")
+estimateSleepFromStep(mode["estimate_sleep_from_step"], [3, 12, "-", "-"], 24, "t04")
 
 
 # estimateSleepFromStep(mode["estimate_sleep_from_step"], [2, 10.5, 2, 3], "test")

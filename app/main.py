@@ -13,5 +13,5 @@ id = "id"
 # 実行
 # dataVisualization(mode["sleep"], id)
 # dataVisualization(mode["step"], id)
-estimateSleepFromStep(mode["estimate_sleep_from_step"], [2, 10.5, 2, 3], 24, "test")
+estimateSleepFromStep(mode["around"], [2, 10.5, 2, 3], 24, "test")
 # estimateSleepFromStep(mode["estimate_sleep_from_step"], [0.5, 8.5, 2, 2], 24, id)

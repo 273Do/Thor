@@ -1,8 +1,8 @@
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.colors import ListedColormap 
+from src.data_frame_settings import dataFrameSettings
+from src.draw_heatmap import drawHeatmap
     
 # 時間をヒートマップの形式に対応するように変換する関数
 ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
@@ -10,9 +10,13 @@ ConvertToHeatmapCompatible = lambda time: int(288 * time / 24)
 # 歩数から睡眠を推定する関数
 def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold, file_name):
     
-    # 時間の設定を読み込む
-    json_open = open('./src/settings.json', 'r')
-    time = json.load(json_open)
+    # 推定に必要な設定
+    data_frame_settings = dataFrameSettings(mode)
+    
+    df = data_frame_settings[0]
+    unique_dates = data_frame_settings[1]
+    heatmap_data = data_frame_settings[2]
+    #-------------------------------------------
     
     # 日を跨ぐかどうか
     is_cross_day = True
@@ -33,23 +37,6 @@ def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold,
         wake_time_threshold = ConvertToHeatmapCompatible(2)
     else:
         wake_time_threshold = ConvertToHeatmapCompatible(time_specified_data[3])
-    
-    # CSVファイルを読み込む
-    df = pd.read_csv(mode["metadata"]["csv_file_path"], dtype={"sourceVersion": str, "device": str}, low_memory=False)
-    
-    # 指定の日付範囲でフィルタリング
-    df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]
-    
-    # "startDate" と "endDate" の列を datetime 型に変換
-    df['startDate'] = pd.to_datetime(df['startDate'])
-    df['endDate'] = pd.to_datetime(df['endDate'])
-    
-    # 抽出対象を指定してフィルタリング
-    df = df[df["device"].str.contains("name:iPhone")]
-    
-    # ヒートマップ用のデータを初期化
-    unique_dates = df['startDate'].dt.date.unique().tolist()
-    heatmap_data = np.zeros((len(unique_dates), 288))  # 288は24時間 x 60分 / 5分刻み
     
     # 推定するアルゴリズムを実装
     for i, date in enumerate(unique_dates):
@@ -94,26 +81,13 @@ def estimateSleepFromStep(mode, time_specified_data, step_observation_threshold,
                 heatmap_data[i, 0:min(estimate_index_array[1])] = 1
             else:
                 heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1])] = 1
-
+    
+    
+    #-------------------------------------------            
     # ヒートマップの描画
-    plt.figure()  # 新しいFigureを作成
-    plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')
+    data_info = f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}"
+    
+    drawHeatmap(mode, heatmap_data, data_info, unique_dates, file_name)
+    
 
-    # タイトル，軸の設定
-    plt.title(mode["heatmap"]["title"])
-    plt.text(260, -1, f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}", fontsize=7)
-    plt.xlabel(mode["heatmap"]["x_label"])
-    plt.ylabel(mode["heatmap"]["y_label"])
-    plt.yticks(range(len(unique_dates)), [date.strftime('%Y-%m-%d') for date in unique_dates], fontsize=8)
     
-    # x軸の目盛りを設定
-    time_labels = np.arange(0, 289, 6*12)  # 6時間ごとに目盛りを表示
-    plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
-    
-    # カラーバーを表示
-    cbar = plt.colorbar(ticks=[0, 1])
-    cbar.set_ticklabels(mode["color_bar"]["tick_labels"])
-    cbar.set_label(mode["color_bar"]["label"])
-    
-    # グラフを保存
-    plt.savefig(mode["metadata"]["image_name"] + "_" + file_name + ".png")

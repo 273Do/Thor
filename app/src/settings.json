@@ -10,7 +10,7 @@
       "image_name": "extraction_data/sleep_heatmap"
     },
     "heatmap": {
-      "title": "Sleep Time Heatmap",
+      "title": "Sleep Time",
       "x_label": "Time (5-minute intervals)",
       "y_label": "Date"
     },
@@ -26,7 +26,7 @@
       "image_name": "extraction_data/step_heatmap"
     },
     "heatmap": {
-      "title": "Step Time Heatmap",
+      "title": "Step Time",
       "x_label": "Time (5-minute intervals)",
       "y_label": "Date"
     },
@@ -35,14 +35,30 @@
       "label": "Sleep Status"
     }
   },
-  "estimate_sleep_from_step": {
-    "mode_name": "estimate_sleep_from_step",
+  "around": {
+    "mode_name": "around_estimate_sleep_from_step",
     "metadata": {
       "csv_file_path": "data/StepCount.csv",
-      "image_name": "extraction_data/estimation_sleep_heatmap"
+      "image_name": "extraction_data/estimation_sleep_heatmap_around"
     },
     "heatmap": {
-      "title": "Estimate Sleep Heatmap",
+      "title": "Estimate Sleep (Around)",
+      "x_label": "Time (5-minute intervals)",
+      "y_label": "Date"
+    },
+    "color_bar": {
+      "tick_labels": ["No Sleep", "Sleep"],
+      "label": "Estimate Sleep"
+    }
+  },
+  "median": {
+    "mode_name": "median_estimate_sleep_from_step",
+    "metadata": {
+      "csv_file_path": "data/StepCount.csv",
+      "image_name": "extraction_data/estimation_sleep_heatmap_median"
+    },
+    "heatmap": {
+      "title": "Estimate Sleep (Median)",
       "x_label": "Time (5-minute intervals)",
       "y_label": "Date"
     },

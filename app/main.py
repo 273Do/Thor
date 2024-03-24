@@ -7,8 +7,11 @@ from src.estimate_sleep_from_step import estimateSleepFromStep
 json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
 
-# 実行
+# 被験者ID
+id = "id"
 
-# dataVisualization(mode["sleep"], "test")
-# dataVisualization(mode["step"], "sleepTest3")
-estimateSleepFromStep(mode["estimate_sleep_from_step"], [2,10.5,2,3], "test")
+# 実行
+# dataVisualization(mode["sleep"], id)
+# dataVisualization(mode["step"], id)
+estimateSleepFromStep(mode["estimate_sleep_from_step"], [2, 10.5, 2, 3], 24, "test")
+# estimateSleepFromStep(mode["estimate_sleep_from_step"], [0.5, 8.5, 2, 2], 24, id)

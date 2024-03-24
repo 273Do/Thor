@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -5,12 +6,16 @@ from matplotlib.colors import ListedColormap
 
 # データ可視化用の関数
 def dataVisualization(mode, file_name):
+
+    # 時間の設定を読み込む
+    json_open = open('./src/settings.json', 'r')
+    time = json.load(json_open)
     
     # CSVファイルを読み込む
     df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)
     
     # 指定の日付範囲でフィルタリング
-    df = df[(df["startDate"] >= mode["metadata"]["start_date"]) & (df["endDate"] <= mode["metadata"]["end_date"])]
+    df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]
     
     # "startDate" と "endDate" の列を datetime 型に変換
     df['startDate'] = pd.to_datetime(df['startDate'])
@@ -19,9 +24,7 @@ def dataVisualization(mode, file_name):
     # 抽出対象を指定してフィルタリング
     if(mode["mode_name"] == "sleep"):
         # デバイス名を取得
-        device_name = df["sourceName"].mode()[0]
-        print("sleepデバイス名：" + device_name)
-        df = df[(df["sourceName"] == device_name) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
+        df = df[(df["sourceName"].str.contains("Watch")) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
     elif(mode["mode_name"]  == "step"):
         df = df[df["device"].str.contains("name:iPhone")]
     
@@ -48,7 +51,7 @@ def dataVisualization(mode, file_name):
     plt.yticks(range(len(unique_dates)), [date.strftime('%Y-%m-%d') for date in unique_dates], fontsize=8)
     
     # x軸の目盛りを設定
-    time_labels = np.arange(0, 288, 6*12)  # 6時間ごとに目盛りを表示
+    time_labels = np.arange(0, 289, 6*12)  # 6時間ごとに目盛りを表示
     plt.xticks(time_labels, [f"{h//12}:{h%12*5:02d}" for h in time_labels])
     
     # カラーバーを表示

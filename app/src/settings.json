@@ -35,6 +35,22 @@
       "label": "Sleep Status"
     }
   },
+  "estimate_sleep_from_step": {
+    "mode_name": "estimate_sleep_from_step",
+    "metadata": {
+      "csv_file_path": "data/StepCount.csv",
+      "image_name": "extraction_data/estimation_sleep_heatmap"
+    },
+    "heatmap": {
+      "title": "Estimate Sleep",
+      "x_label": "Time (5-minute intervals)",
+      "y_label": "Date"
+    },
+    "color_bar": {
+      "tick_labels": ["No Sleep", "Sleep"],
+      "label": "Estimate Sleep"
+    }
+  },
   "around": {
     "mode_name": "around_estimate_sleep_from_step",
     "metadata": {

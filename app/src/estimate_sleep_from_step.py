@@ -84,7 +84,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
 
 # 平均就寝時間と平均起床時間の中央時刻の前後を精査して，歩数から睡眠を推定する関数
 def estimateSleepFromStep_Median(mode, time_specified_data, step_observation_threshold, file_name):
-    setReferenceTime(50, 50)
+    setReferenceTime([93, 6], [93, 6])#平日と休日の基準点と精査先パーセントを指定
      # 推定に必要な設定
  
     data_frame_settings = dataFrameSettings(mode)

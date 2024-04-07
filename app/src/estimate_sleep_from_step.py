@@ -135,17 +135,16 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
         if(is_skip == False):
             # 平均就寝時間が24時を超えない場合とそうでない場合
             # 各行に対して、startDate から endDate の範囲を1に設定
-            if((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0)):
-                heatmap_data[i, int((previous_day_data['endDate'].min().hour * 60 + previous_day_data['endDate'].min().minute) / 5):288] = 1
-                heatmap_data[i, 0:estimate_index_array[1]] = 1
             if(is_cross_day == False):
-                # heatmap_data[i, max(estimate_index_array[0]):288] = 1
-                # heatmap_data[i, 0:min(estimate_index_array[1])] = 1
+           
                 heatmap_data[i, estimate_index_array[0]:288] = 1
                 heatmap_data[i, 0:estimate_index_array[1]] = 1
             else:
-                # heatmap_data[i, max(estimate_index_array[0]):min(estimate_index_array[1])] = 1
-                heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
+                if((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0) & (i > 0)):
+                    heatmap_data[i - 1, int((previous_day_data['endDate'].min().hour * 60 + previous_day_data['endDate'].min().minute) / 5):288] = 1
+                    heatmap_data[i, 0:estimate_index_array[1]] = 1
+                else:
+                    heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
                 
         previous_day_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time())]
     

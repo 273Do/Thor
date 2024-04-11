@@ -3,7 +3,12 @@ from src.module.data_frame_settings import dataFrameSettings
 from src.module.draw_heatmap import drawHeatmap
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
+from src.module.calculate_error import calculate_error_mse, calculate_error_mae
 import itertools
+
+# 正解データを格納したテキストファイルのパス
+true_data_pass = "./extraction_data/true_sleep_data.txt"
+pred_data_pass = ""
 
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
 def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_threshold, file_name):
@@ -154,11 +159,16 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
     drawHeatmap("Around", mode, heatmap_data, data_info, unique_dates, file_name)
     
-    # ヒートマップデータをテキストファイルに出力(正解データ)
-    file = open(f"./extraction_data/pred_sleep_data(Around).txt", "w")
+    # ヒートマップデータをテキストファイルに出力(推定データ)
+    pred_data_pass = "./extraction_data/pred_sleep_data(Around).txt"
+    file = open(pred_data_pass, "w")
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
     file.close()
+    
+    # 誤差の計算
+    calculate_error_mse(true_data_pass, pred_data_pass) # 平均二乗誤差
+    calculate_error_mae(true_data_pass, pred_data_pass) # 平均絶対誤差
     
     
 
@@ -291,11 +301,16 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"
     drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, unique_dates, file_name)
     
-    # ヒートマップデータをテキストファイルに出力(正解データ)
-    file = open(f"./extraction_data/pred_sleep_data(Median-{method_type}).txt", "w")
+    # ヒートマップデータをテキストファイルに出力(推定データ)
+    pred_data_pass = f"./extraction_data/pred_sleep_data(Median-{method_type}).txt"
+    file = open(pred_data_pass, "w")
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
     file.close()
+    
+    # 誤差の計算
+    calculate_error_mse(true_data_pass, pred_data_pass) # 平均二乗誤差
+    calculate_error_mae(true_data_pass, pred_data_pass) # 平均絶対誤差
     
     # set_bed_range = [weekday_time[0], weekday_time[3]]
         #     set_wake_range = [weekday_time[1], weekday_time[2]]

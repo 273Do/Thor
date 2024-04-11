@@ -3,7 +3,7 @@ from src.module.data_frame_settings import dataFrameSettings
 from src.module.draw_heatmap import drawHeatmap
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
-from src.module.calculate_error import calculate_error_mse, calculate_error_mae
+from src.module.calculate_error import calculate_error
 import itertools
 
 # 正解データを格納したテキストファイルのパス
@@ -153,12 +153,6 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
                 
         previous_day_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time())]
     
-    
-    #-------------------------------------------            
-    # ヒートマップの描画
-    data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
-    drawHeatmap("Around", mode, heatmap_data, data_info, unique_dates, file_name)
-    
     # ヒートマップデータをテキストファイルに出力(推定データ)
     pred_data_pass = "./extraction_data/pred_sleep_data(Around).txt"
     file = open(pred_data_pass, "w")
@@ -167,8 +161,14 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     file.close()
     
     # 誤差の計算
-    calculate_error_mse(true_data_pass, pred_data_pass) # 平均二乗誤差
-    calculate_error_mae(true_data_pass, pred_data_pass) # 平均絶対誤差
+    calc_error = calculate_error(true_data_pass, pred_data_pass)
+    
+    #-------------------------------------------            
+    # ヒートマップの描画
+    data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
+    drawHeatmap("Around", mode, heatmap_data, data_info, calc_error, unique_dates, file_name)
+    
+    # 誤差の計算
     
     
 
@@ -296,11 +296,6 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
         
         previous_day_data_ = date_data[date_data["endDate"].dt.time >= pd.to_datetime(set_bed_range[1], format='%H:%M').time()]
     
-    #-------------------------------------------            
-    # ヒートマップの描画
-    data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"
-    drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, unique_dates, file_name)
-    
     # ヒートマップデータをテキストファイルに出力(推定データ)
     pred_data_pass = f"./extraction_data/pred_sleep_data(Median-{method_type}).txt"
     file = open(pred_data_pass, "w")
@@ -309,8 +304,12 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     file.close()
     
     # 誤差の計算
-    calculate_error_mse(true_data_pass, pred_data_pass) # 平均二乗誤差
-    calculate_error_mae(true_data_pass, pred_data_pass) # 平均絶対誤差
+    calc_error = calculate_error(true_data_pass, pred_data_pass)
+    
+     #-------------------------------------------            
+    # ヒートマップの描画
+    data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"
+    drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, calc_error, unique_dates, file_name)
     
     # set_bed_range = [weekday_time[0], weekday_time[3]]
         #     set_wake_range = [weekday_time[1], weekday_time[2]]

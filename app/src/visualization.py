@@ -24,7 +24,8 @@ def dataVisualization(mode, file_name):
     # 抽出対象を指定してフィルタリング
     if(mode["mode_name"] == "sleep"):
         # デバイス名を取得
-        df = df[(df["sourceName"].str.contains("Watch")) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
+        # df = df[(df["sourceName"].str.contains("Watch")) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
+        df = df[(df["sourceVersion"].str.contains("10.")) & (df["value"] == "HKCategoryValueSleepAnalysisInBed")]
     elif(mode["mode_name"]  == "step"):
         df = df[df["device"].str.contains("name:iPhone")]
     

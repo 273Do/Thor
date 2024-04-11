@@ -3,4 +3,5 @@
 app/data/
 app/extraction_data/
 app/src/__pycache__/
-app/src/device_name.txt
+app/src/module/__pycache__/
+# app/src/device_name.txt

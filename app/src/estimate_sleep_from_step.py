@@ -191,11 +191,11 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
         
         # その日が平日か土日かによって，中央時刻と精査先時刻を設定
         if (date.weekday() == 5 or (date.weekday() == 6)):
-            set_bed_range = [weekday_time[0], weekday_time[3]]
-            set_wake_range = [weekday_time[1], weekday_time[2]]
-        else:  
             set_bed_range = [holiday_time[0], holiday_time[3]]
             set_wake_range = [holiday_time[1], holiday_time[2]]
+        else: 
+            set_bed_range = [weekday_time[0], weekday_time[3]]
+            set_wake_range = [weekday_time[1], weekday_time[2]]
         # print(set_bed_range, set_wake_range)
         
         # 就寝時刻を推定：中央時刻より前のデータを取得
@@ -215,17 +215,16 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
             # TODO: 前日に遡る処理を追加
             # データがない場合，就寝時刻を何に設定するか考える必要がある
             is_cross_day_  = False
-            print(is_cross_day_)
             if(len(previous_day_data_) > 0):
                 # 前日のデータがある場合に前日のデータを取得精査してヒートマップの形式に変換
-                print(date)
                 bed_time=int((previous_day_data_['endDate'].max().hour * 60 + previous_day_data_['endDate'].max().minute) / 5)
                 estimate_index_array.append(bed_time)
                 # bed_time = int((previous_day_data['endDate'].max().hour * 60 + previous_day_data['endDate'].max().minute) / 5)
                 # estimate_index_array.append(bed_time)
             else:
                 is_cross_day_  = True
-                estimate_index_array.append(0)
+                # estimate_index_array.append(0)
+                estimate_index_array.append(time_to_decimal(set_bed_range[0]))
             # print("No data")
        
         # 起床時刻を推定：中央時刻より前のデータを取得
@@ -244,7 +243,8 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
             # estimate_index_array.append(time_to_decimal(wake_time_average[:-3]))
             # print(time_to_decimal(set_wake_range[0]))
             # TODO: データがない場合，起床時刻を何に設定するか考える必要がある
-            estimate_index_array.append(time_to_decimal(set_wake_range[0]))
+            estimate_index_array.append(time_to_decimal(set_wake_range[1]))
+            #  estimate_index_array.append(time_to_decimal(set_wake_range[1]))
             # print("No data")
         # for j in range(len(date_data) - 1, -1, -1):
         #     row = date_data.iloc[j] #sleep_date_data
@@ -280,7 +280,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
         
         previous_day_data_ = date_data[date_data["endDate"].dt.time >= pd.to_datetime(set_bed_range[1], format='%H:%M').time()]
     
-    
+    print(len(heatmap_data[0]))
     #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"

@@ -10,7 +10,7 @@ mode = json.load(json_open)
 # 被験者ID
 id = "id"
 
-# 実行
+# 初期のみ実行
 # dataVisualization(mode["sleep"], id)
 # dataVisualization(mode["step"], id)
 

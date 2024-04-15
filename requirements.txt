@@ -13,6 +13,7 @@ pyarrow
 # XlsxWriter
 # python-math
 # scikit-learn
+itertools
 
 # 画像系
 matplotlib

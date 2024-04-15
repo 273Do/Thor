@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
+import itertools
 
 # データ可視化用の関数
 def dataVisualization(mode, file_name):
@@ -62,3 +63,9 @@ def dataVisualization(mode, file_name):
     
     # グラフを保存
     plt.savefig(mode["metadata"]["image_name"] + "_" + file_name + ".png")
+    
+    # ヒートマップデータをテキストファイルに出力(正解データ)
+    file = open(f"./extraction_data/true_{mode["mode_name"]}_data.txt", "w")
+    for d in list(itertools.chain.from_iterable(heatmap_data)):
+        file.write(f"{d} ")
+    file.close()

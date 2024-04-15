@@ -2,7 +2,7 @@
 import json
 from src.visualization import dataVisualization
 from src.estimate_sleep_from_step import estimateSleepFromStep_Around, estimateSleepFromStep_Median
-import numpy as np
+
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
@@ -10,7 +10,7 @@ mode = json.load(json_open)
 # 被験者ID
 id = "id"
 
-# 実行
+# 初期のみ実行
 # dataVisualization(mode["sleep"], id)
 # dataVisualization(mode["step"], id)
 

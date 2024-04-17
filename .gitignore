@@ -1,8 +1,8 @@
 .DS_Store
 
 app/data/
+app/export_zip/
 app/extraction_data/
 app/src/__pycache__/
 app/src/module/__pycache__/
 .vscode/
-# app/src/device_name.txt

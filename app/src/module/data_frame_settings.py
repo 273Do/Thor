@@ -3,14 +3,14 @@ import numpy as np
 import pandas as pd
 
 # 推定アルゴリズムに必要なデータフレームなどの設定
-def dataFrameSettings(mode):
+def dataFrameSettings(mode, subject_data):
   
     # 時間の設定を読み込む
     json_open = open('./src/settings.json', 'r')
     time = json.load(json_open)
     
     # CSVファイルを読み込む
-    df = pd.read_csv(mode["metadata"]["csv_file_path"], dtype={"sourceVersion": str, "device": str}, low_memory=False)
+    df = pd.read_csv(mode["metadata"]["csv_file_path"].replace("{ID_HERE}", f"{subject_data[0]}_{subject_data[1]}_{subject_data[2]}"), dtype={"sourceVersion": str, "device": str}, low_memory=False)
     
     # 指定の日付範囲でフィルタリング
     df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]

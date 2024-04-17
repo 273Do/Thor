@@ -6,14 +6,14 @@ from matplotlib.colors import ListedColormap
 import itertools
 
 # データ可視化用の関数
-def dataVisualization(mode, file_name):
+def dataVisualization(mode, subject_data):
 
     # 時間の設定を読み込む
     json_open = open('./src/settings.json', 'r')
     time = json.load(json_open)
     
     # CSVファイルを読み込む
-    df = pd.read_csv(mode["metadata"]["csv_file_path"], low_memory=False)
+    df = pd.read_csv(mode["metadata"]["csv_file_path"].replace("{ID_HERE}", f"{subject_data[0]}_{subject_data[1]}_{subject_data[2]}"), low_memory=False)
     
     # 指定の日付範囲でフィルタリング
     df = df[(df["startDate"] >= time["time"]["start_date"]) & (df["endDate"] <= time["time"]["end_date"])]
@@ -62,7 +62,7 @@ def dataVisualization(mode, file_name):
     cbar.set_label(mode["color_bar"]["label"])
     
     # グラフを保存
-    plt.savefig(mode["metadata"]["image_name"] + "_" + file_name + ".png")
+    plt.savefig(mode["metadata"]["image_name"] + "_" + subject_data[0] + ".png")
     
     # ヒートマップデータをテキストファイルに出力(正解データ)
     file = open(f"./extraction_data/true_{mode["mode_name"]}_data.txt", "w")

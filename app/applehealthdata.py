@@ -20,7 +20,7 @@ from collections import Counter, OrderedDict
 __version__ = '1.3'
 
 RECORD_FIELDS = OrderedDict((
-    ('sourceName', 's'),
+    # ('sourceName', 's'),
     ('sourceVersion', 's'),
     ('device', 's'),
     ('type', 's'),
@@ -43,7 +43,7 @@ ACTIVITY_SUMMARY_FIELDS = OrderedDict((
 ))
 
 WORKOUT_FIELDS = OrderedDict((
-    ('sourceName', 's'),
+    # ('sourceName', 's'),
     ('sourceVersion', 's'),
     ('device', 's'),
     ('creationDate', 'd'),

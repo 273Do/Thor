@@ -20,12 +20,12 @@ json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
 
 # 睡眠と歩数の可視化(初期のみ実行)
-# dataVisualization(mode["sleep"], id)
-# dataVisualization(mode["step"], id)
+dataVisualization(mode["sleep"], [id, bed, wake])
+dataVisualization(mode["step"], [id, bed, wake])
 
 # 回答してもらった時刻をもとに精査する方法
-estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [[ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, id)
+estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [[ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, [id, bed, wake])
 
 
 # nhkの調査をもとに精査する方法
-estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [[94, 4], [94, 4]], 24, id)
+estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [[94, 4], [94, 4]], 24, [id, bed, wake])

@@ -1,12 +1,12 @@
 {
   "time": {
-    "start_date": "2024-02-01",
-    "end_date": "2024-03-01"
+    "start_date": "2024-01-01",
+    "end_date": "2024-02-01"
   },
   "sleep": {
     "mode_name": "sleep",
     "metadata": {
-      "csv_file_path": "data/SleepAnalysis.csv",
+      "csv_file_path": "data/{ID_HERE}/SleepAnalysis.csv",
       "image_name": "extraction_data/sleep_heatmap"
     },
     "heatmap": {
@@ -22,7 +22,7 @@
   "step": {
     "mode_name": "step",
     "metadata": {
-      "csv_file_path": "data/StepCount.csv",
+      "csv_file_path": "data/{ID_HERE}/StepCount.csv",
       "image_name": "extraction_data/step_heatmap"
     },
     "heatmap": {
@@ -38,7 +38,7 @@
   "estimate_sleep_from_step": {
     "mode_name": "estimate_sleep_from_step",
     "metadata": {
-      "csv_file_path": "data/StepCount.csv",
+      "csv_file_path": "data/{ID_HERE}/StepCount.csv",
       "image_name": "extraction_data/estimation_sleep_heatmap"
     },
     "heatmap": {
@@ -54,7 +54,7 @@
   "around": {
     "mode_name": "around_estimate_sleep_from_step",
     "metadata": {
-      "csv_file_path": "data/StepCount.csv",
+      "csv_file_path": "data/{ID_HERE}/StepCount.csv",
       "image_name": "extraction_data/estimation_sleep_heatmap_around"
     },
     "heatmap": {
@@ -70,7 +70,7 @@
   "median": {
     "mode_name": "median_estimate_sleep_from_step",
     "metadata": {
-      "csv_file_path": "data/StepCount.csv",
+      "csv_file_path": "data/{ID_HERE}/StepCount.csv",
       "image_name": "extraction_data/estimation_sleep_heatmap_median"
     },
     "heatmap": {

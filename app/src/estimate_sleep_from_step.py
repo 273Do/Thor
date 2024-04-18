@@ -11,11 +11,11 @@ true_data_pass = "./extraction_data/true_sleep_data.txt"
 pred_data_pass = ""
 
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
-def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_threshold, file_name):
+def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_threshold, subject_data):
     
     # 推定に必要な設定
     # 必要なデータをセット
-    data_frame_settings = dataFrameSettings(mode)
+    data_frame_settings = dataFrameSettings(mode, subject_data)
     [df, unique_dates, heatmap_data] = data_frame_settings
     #-------------------------------------------
     
@@ -71,7 +71,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
             bed_date_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time()) & (date_data["endDate"].dt.time <= pd.to_datetime(bed_time_range[1], format='%H:%M:%S').time())]
         else:
             # previous_time = 24 + time_specified_data[0][0] - time_specified_data[1][0]
-            print(bed_time_range[0])
+            # print(bed_time_range[0])
             bed_date_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime('00:00:00', format='%H:%M:%S').time()) & (date_data["endDate"].dt.time <= pd.to_datetime(bed_time_range[1], format='%H:%M:%S').time())]
             # previous_date_data = previous_day_data[(date_data["endDate"].dt.time >= pd.to_datetime('00:00:00', format='%H:%M:%S').time()) & (date_data["endDate"].dt.time <= pd.to_datetime(bed_time_range[1], format='%H:%M:%S').time())]
         
@@ -162,18 +162,18 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     
     # 誤差の計算
     calc_error = calculate_error(true_data_pass, pred_data_pass)
+
     
     #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
-    drawHeatmap("Around", mode, heatmap_data, data_info, calc_error, unique_dates, file_name)
+    drawHeatmap("Around", mode, heatmap_data, data_info, calc_error, unique_dates, subject_data[0])
     
-    # 誤差の計算
     
     
 
 # 平均就寝時間と平均起床時間の中央時刻の前後を精査して，歩数から睡眠を推定する関数
-def estimateSleepFromStep_Median(method, time_specified_data, step_observation_threshold, file_name):
+def estimateSleepFromStep_Median(method, time_specified_data, step_observation_threshold, subject_data):
     
     # 推定に必要な設定
     
@@ -187,7 +187,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     print(weekday_time, holiday_time)
  
     # 必要なデータをセット
-    data_frame_settings = dataFrameSettings(mode)
+    data_frame_settings = dataFrameSettings(mode, subject_data)
     [df, unique_dates, heatmap_data] = data_frame_settings
     #-------------------------------------------
     
@@ -309,7 +309,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
      #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"
-    drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, calc_error, unique_dates, file_name)
+    drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, calc_error, unique_dates, subject_data[0])
     
     # set_bed_range = [weekday_time[0], weekday_time[3]]
         #     set_wake_range = [weekday_time[1], weekday_time[2]]

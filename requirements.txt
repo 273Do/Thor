@@ -12,8 +12,7 @@ pyarrow
 # xlrd
 # XlsxWriter
 # python-math
-# scikit-learn
-itertools
+scikit-learn
 
 # 画像系
 matplotlib

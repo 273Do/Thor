@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
-def drawHeatmap(method, mode, heatmap_data, data_info, calc_error, unique_dates, file_name):
+def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, file_name):
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
     plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')
@@ -12,7 +12,8 @@ def drawHeatmap(method, mode, heatmap_data, data_info, calc_error, unique_dates,
     plt.title(mode["heatmap"]["title"] + " (" + method + ")")
     # plt.text(260, -1, f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}", fontsize=7)
     plt.text(260, -1, data_info, fontsize=7)
-    plt.text(260, 34.4, f"MSE: {calc_error[0]}\nMAE: {calc_error[1]}", fontsize=7)
+    # plt.text(260, 34.4, f"MSE: {calc_error[0]}\nMAE: {calc_error[1]}", fontsize=7)
+    plt.text(-52, 0.2, calc_info, fontsize=7)
     #32or34.4
     plt.xlabel(mode["heatmap"]["x_label"])
     plt.ylabel(mode["heatmap"]["y_label"])
@@ -32,3 +33,21 @@ def drawHeatmap(method, mode, heatmap_data, data_info, calc_error, unique_dates,
     # グラフを保存
     plt.savefig(mode["metadata"]["image_name"] + "_" + method + "_" + file_name + ".png")
     # ---ここまで共通化--
+    
+def confusionMatrixHeatmap(confusion_matrix, method, subject_data):
+    plt.figure()  # 新しいFigureを作成
+    
+    plt.imshow(confusion_matrix, cmap='Blues', interpolation='nearest')
+
+    plt.title(f'Estimation Sleep ({method})')
+    plt.colorbar(label='Count')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.xticks(ticks=[0, 1], labels=['Positive', 'Negative'])
+    plt.yticks(ticks=[0, 1], labels=['Positive', 'Negative'])
+
+    for i in range(2):
+        for j in range(2):
+            plt.text(j, i, confusion_matrix[i, j], ha='center', va='center', color='black')
+
+    plt.savefig(f'extraction_data/confusion_matrix_{method}_{subject_data[0]}.png') 

@@ -65,7 +65,7 @@ def dataVisualization(mode, subject_data):
     plt.savefig(mode["metadata"]["image_name"] + "_" + subject_data[0] + ".png")
     
     # ヒートマップデータをテキストファイルに出力(正解データ)
-    file = open(f"./extraction_data/true_{mode["mode_name"]}_data.txt", "w")
+    file = open(f"./extraction_data/actual_{mode["mode_name"]}_data.txt", "w")
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
     file.close()

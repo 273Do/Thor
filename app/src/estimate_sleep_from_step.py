@@ -7,7 +7,7 @@ from src.module.calculate_error import calculate_error
 import itertools
 
 # 正解データを格納したテキストファイルのパス
-true_data_pass = "./extraction_data/true_sleep_data.txt"
+actual_data_pass = "./extraction_data/actual_sleep_data.txt"
 pred_data_pass = ""
 
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
@@ -161,13 +161,14 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     file.close()
     
     # 誤差の計算
-    calc_error = calculate_error(true_data_pass, pred_data_pass)
-
+    calc_error = calculate_error(actual_data_pass, pred_data_pass, "Around", subject_data)
     
     #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
-    drawHeatmap("Around", mode, heatmap_data, data_info, calc_error, unique_dates, subject_data[0])
+    # calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
+    calc_info="debug"
+    drawHeatmap("Around", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
     
     
@@ -304,12 +305,14 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     file.close()
     
     # 誤差の計算
-    calc_error = calculate_error(true_data_pass, pred_data_pass)
+    calc_error = calculate_error(actual_data_pass, pred_data_pass, f"Median-{method_type}", subject_data)
     
-     #-------------------------------------------            
+    #-------------------------------------------            
     # ヒートマップの描画
-    data_info = f"range:W:{time_specified_data[0][0]}%,{time_specified_data[0][1]}%, H:{time_specified_data[1][0]}%,{time_specified_data[1][1]}%\nW:bed:{weekday_time[0]}->{weekday_time[3]}, wake:{weekday_time[1]}->{weekday_time[2]},\nH:bed:{holiday_time[0]}->{holiday_time[3]}, wake:{holiday_time[1]}->{holiday_time[2]}"
-    drawHeatmap(f"Median - {method_type}", mode, heatmap_data, data_info, calc_error, unique_dates, subject_data[0])
+    data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
+    # calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
+    calc_info="debug"
+    drawHeatmap(f"Median-{method_type}", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
     # set_bed_range = [weekday_time[0], weekday_time[3]]
         #     set_wake_range = [weekday_time[1], weekday_time[2]]

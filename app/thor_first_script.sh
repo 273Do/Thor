@@ -49,7 +49,7 @@ for file in *; do
     mkdir "../data/$id"_"$bed"_"$wake"
     mv "../data"/*.csv "../data/$id"_"$bed"_"$wake"
 
-    # ヒートマップ格納ようのフォルダを作成
+    # 画像格納用のフォルダを作成
     mkdir "../extraction_data/$id"_"$bed"_"$wake"
 
     # 区切り線を表示

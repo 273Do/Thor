@@ -9,7 +9,7 @@ from src.module.time_function import ConvertToH
 
 # コマンドライン引数を受け取って処理を行う
 [function, id, bed, wake] = sys.argv
-print(f"id:{id}, bed:{bed}, wake:{wake}")
+# print(f"id:{id}, bed:{bed}, wake:{wake}")
 
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング

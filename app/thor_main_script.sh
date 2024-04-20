@@ -23,7 +23,7 @@ for file in *; do
     id=${file//$bed/}
     id=${id//$wake/}
     id=${id//_/}
-    # echo "id:$id, bed:$bed, wake:$wake"
+    echo "id:$id, bed:$bed, wake:$wake"
 
     # appディレクトリに戻る
     cd ..

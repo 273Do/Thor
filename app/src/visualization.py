@@ -34,18 +34,21 @@ def dataVisualization(mode, subject_data):
     unique_dates = pd.date_range(start=time["time"]["start_date"], end = datetime.strptime(time["time"]["end_date"], "%Y-%m-%d") - timedelta(days=1)).date
     observed_dates = df['startDate'].dt.date.unique()
     heatmap_data = np.zeros((len(unique_dates), 288))  # 288：24時間 x 60分 / 5分刻み
-   
+
     # 各行に対して、startDate から endDate の範囲を1に設定
     for i, date in enumerate(unique_dates):
-        if date in observed_dates:
-            date_data = df[df['startDate'].dt.date == date]
-            for _, row in date_data.iterrows():
-                start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
-                end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
-                heatmap_data[i, start_index:end_index + 1] = 1
+        if(len(observed_dates) > 0):
+            if date in observed_dates:
+                date_data = df[df['startDate'].dt.date == date]
+                for _, row in date_data.iterrows():
+                    start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
+                    end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
+                    heatmap_data[i, start_index:end_index + 1] = 1
+            else:
+                heatmap_data[i, 0:288] = 0
         else:
             heatmap_data[i, 0:288] = 0
-                 
+                           
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
     plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')

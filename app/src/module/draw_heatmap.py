@@ -34,12 +34,13 @@ def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, 
     plt.savefig(mode["metadata"]["image_name"] + "_" + method + "_" + file_name + ".png")
     # ---ここまで共通化--
     
-def confusionMatrixHeatmap(confusion_matrix, method, subject_data):
+def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
     plt.figure()  # 新しいFigureを作成
     
     plt.imshow(confusion_matrix, cmap='Blues', interpolation='nearest')
 
     plt.title(f'Estimation Sleep ({method})')
+    plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='Count')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')

@@ -1,10 +1,10 @@
 import json
+import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from datetime import datetime, timedelta
-import itertools
 
 # データ可視化用の関数
 def dataVisualization(mode, subject_data):
@@ -68,8 +68,14 @@ def dataVisualization(mode, subject_data):
     # グラフを保存
     plt.savefig(mode["metadata"]["image_name"] + "_" + subject_data[0] + ".png")
     
-    # ヒートマップデータをテキストファイルに出力(正解データ)
+    # ヒートマップデータと日付をテキストファイルに出力(正解データ)
     file = open(f"./extraction_data/actual_{mode["mode_name"]}_data.txt", "w")
+    # ヒートマップのデータを配列として格納
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
+    file.write("\n")
+    # 日付データを文字列に変換してリストに格納
+    date_strings = [date.strftime("%Y-%m-%d") for date in observed_dates]
+    for date_str in date_strings:
+        file.write(f"{date_str} ")
     file.close()

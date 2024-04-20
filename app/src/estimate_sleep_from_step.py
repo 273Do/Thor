@@ -1,10 +1,10 @@
+import itertools
 import pandas as pd
 from src.module.data_frame_settings import dataFrameSettings
 from src.module.draw_heatmap import drawHeatmap
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
 from src.module.calculate_error import calculate_error
-import itertools
 
 # 正解データを格納したテキストファイルのパス
 actual_data_pass = "./extraction_data/actual_sleep_data.txt"
@@ -153,11 +153,16 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
                 
         previous_day_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time())]
     
-    # ヒートマップデータをテキストファイルに出力(推定データ)
+    # ヒートマップデータと日付をテキストファイルに出力(推定データ)
     pred_data_pass = "./extraction_data/pred_sleep_data(Around).txt"
     file = open(pred_data_pass, "w")
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
+    file.write("\n")
+    # 日付データを文字列に変換してリストに格納
+    date_strings = [date.strftime("%Y-%m-%d") for date in unique_dates]
+    for date_str in date_strings:
+        file.write(f"{date_str} ")
     file.close()
     
     # 誤差の計算
@@ -166,8 +171,8 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
-    # calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
-    calc_info="debug"
+    calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
+    
     drawHeatmap("Around", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
     
@@ -297,11 +302,16 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
         
         previous_day_data_ = date_data[date_data["endDate"].dt.time >= pd.to_datetime(set_bed_range[1], format='%H:%M').time()]
     
-    # ヒートマップデータをテキストファイルに出力(推定データ)
+    # ヒートマップデータと日付をテキストファイルに出力(推定データ)
     pred_data_pass = f"./extraction_data/pred_sleep_data(Median-{method_type}).txt"
     file = open(pred_data_pass, "w")
     for d in list(itertools.chain.from_iterable(heatmap_data)):
         file.write(f"{d} ")
+    file.write("\n")
+    # 日付データを文字列に変換してリストに格納
+    date_strings = [date.strftime("%Y-%m-%d") for date in unique_dates]
+    for date_str in date_strings:
+        file.write(f"{date_str} ")
     file.close()
     
     # 誤差の計算
@@ -310,8 +320,8 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     #-------------------------------------------            
     # ヒートマップの描画
     data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}, \nstep observation threshold:{step_observation_threshold}"
-    # calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
-    calc_info="debug"
+    calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
+    
     drawHeatmap(f"Median-{method_type}", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
     # set_bed_range = [weekday_time[0], weekday_time[3]]

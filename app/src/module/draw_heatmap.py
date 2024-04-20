@@ -6,7 +6,7 @@ from matplotlib.colors import ListedColormap
 def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, file_name):
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
-    plt.imshow(heatmap_data, cmap=ListedColormap(['white', 'blue']), aspect='auto', interpolation='none')
+    plt.imshow(heatmap_data, cmap=ListedColormap(['#ffffff', '#08306b']), aspect='auto', interpolation='none')
 
     # タイトル，軸の設定
     plt.title(mode["heatmap"]["title"] + " (" + method + ")")

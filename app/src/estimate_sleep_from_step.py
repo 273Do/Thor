@@ -1,7 +1,7 @@
 import itertools
 import pandas as pd
 from src.module.data_frame_settings import dataFrameSettings
-from src.module.draw_heatmap import drawHeatmap
+from src.module.draw_heatmap import drawHeatmap, heatmapOfCompareTrueDataAndEstimatedData
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
 from src.module.calculate_error import calculate_error
@@ -179,6 +179,8 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     
     drawHeatmap("Around", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
+    # 正解データと推定データを比較してヒートマップに表示
+    heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [time_to_decimal(bed_time_average[:-3]), time_to_decimal(wake_time_average[:-3])], data_info, calc_info, "Around", subject_data)
     
     
 
@@ -335,8 +337,5 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     
     drawHeatmap(f"Median-{method_type}", mode, heatmap_data, data_info, calc_info, unique_dates, subject_data[0])
     
-    # set_bed_range = [weekday_time[0], weekday_time[3]]
-        #     set_wake_range = [weekday_time[1], weekday_time[2]]
-        # else:  
-        #     set_bed_range = [holiday_time[0], holiday_time[3]]
-        #     set_wake_range = [holiday_time[1], holiday_time[2]]
+    # 正解データと推定データを比較してヒートマップに表示
+    heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [weekday_time, holiday_time], data_info, calc_info, method_type, subject_data)

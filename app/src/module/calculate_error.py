@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
-from src.module.draw_heatmap import confusionMatrixHeatmap
+from src.module.draw_heatmap import  confusionMatrixHeatmap
 import sys
 
 # 誤差の計算
@@ -20,11 +20,11 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
 
         pred_data = pred_array[0].split()
         pred_dates = pred_array[1].split()
-            
+        
         # np配列に変換，288個ずつに分割
         actual_data = np.array(actual_data, dtype=float).reshape(-1, 288)
         pred_data = np.array(pred_data, dtype=float).reshape(-1, 288)
-
+        
         # 日付をkeyとして，それぞれのデータのオブジェクト(辞書)を作成する
         actual_dictionary = {}
         pred_dictionary = {}
@@ -52,9 +52,15 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
     # print(f"MAE: {mae}") # 平均絶対誤差
         
         # 混同行列を出力
-        cm = confusion_matrix(extracted_actual_data, extracted_pred_data, labels=[1, 0])
+        cm = confusion_matrix(extracted_actual_data, extracted_pred_data, labels=[1, 0], normalize='true')
         print("confusion_matrix")
         print(np.array(cm))
+        
+        # 行の合計を計算
+        # row_sums = cm.sum(axis=1, keepdims=True)
+        
+        # 各セルを行の合計で正規化
+        # normalized_cm = cm / row_sums
     
         data_info = f"valid date count:{len(actual_dates)}, \ndata count:{len(extracted_actual_data)}"
         confusionMatrixHeatmap(np.array(cm), method, data_info, subject_data)
@@ -80,7 +86,7 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
         print(f1_measure)
 
         # sys.exit()
-        return [accuracy, precision, recall, f1_measure]
+        return [accuracy, precision, recall, f1_measure, [actual_data, pred_data, pred_dates]]
     
     else:
         print("正解データが観測されていません．")

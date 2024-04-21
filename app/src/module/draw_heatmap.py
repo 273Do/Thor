@@ -11,7 +11,7 @@ def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, 
     plt.imshow(heatmap_data, cmap=ListedColormap(['#ffffff', '#08306b']), aspect='auto', interpolation='none')
 
     # タイトル，軸の設定
-    plt.title(f"{mode["heatmap"]["title"]}({method})")
+    # plt.title(f"{mode["heatmap"]["title"]}({method})")
     # plt.text(260, -1, f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}", fontsize=7)
     plt.text(260, -1, data_info, fontsize=7)
     # plt.text(260, 34.4, f"MSE: {calc_error[0]}\nMAE: {calc_error[1]}", fontsize=7)
@@ -41,7 +41,7 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
     
     plt.imshow(confusion_matrix, cmap='Blues', interpolation='nearest')
 
-    plt.title(f'Estimation Sleep ({method})')
+    # plt.title(f'Estimation Sleep ({method})')
     plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='Count')
     plt.xlabel('Predicted')
@@ -51,7 +51,7 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
 
     for i in range(2):
         for j in range(2):
-            plt.text(j, i, confusion_matrix[i, j], ha='center', va='center', color='black')
+            plt.text(j, i, format(confusion_matrix[i, j], ".2f"), ha='center', va='center', color='black')
 
     plt.savefig(f'extraction_data/confusion_matrix_{method}_{subject_data[0]}.png') 
 
@@ -66,7 +66,7 @@ def heatmapOfCompareTrueDataAndEstimatedData(actual_data, pred_data, pred_dates,
     for date in pred_dates:
         unique_dates.append(date)
         unique_dates.append("")
-    print(unique_dates)
+
     # データの結合
     mix_data = np.array([])
     # print(actual_data[0].tolist())
@@ -76,31 +76,46 @@ def heatmapOfCompareTrueDataAndEstimatedData(actual_data, pred_data, pred_dates,
         
     mix_data = mix_data.reshape(-1, 288)
     
+    # 休日かどうかを保持
+    isHoliday = False
     if(method == "Around"):
         for j, _ in enumerate(unique_dates):
             mix_data[j, time_average[0]:time_average[0]+1] = 3
             mix_data[j, time_average[1]-1:time_average[1]] = 3
     else:
         for j, date in enumerate(unique_dates):
-            
-            if(date != "" and (datetime.strptime(date, "%Y-%m-%d").weekday() == 5 or (datetime.strptime(date, "%Y-%m-%d").weekday() == 6))):
-                mix_data[j, time_to_decimal(time_average[0][0]):time_to_decimal(time_average[0][0])+1] = 3
-                mix_data[j, time_to_decimal(time_average[0][1])-1:time_to_decimal(time_average[0][1])] = 3
-                mix_data[j, time_to_decimal(time_average[0][2]):time_to_decimal(time_average[0][2])+1] = 3
-                mix_data[j, time_to_decimal(time_average[0][3])-1:time_to_decimal(time_average[0][3])] = 3
+            if(date != "" ):
+                if((datetime.strptime(date, "%Y-%m-%d").weekday() == 5 or (datetime.strptime(date, "%Y-%m-%d").weekday() == 6))):
+                    isHoliday = True
+                    mix_data[j, time_to_decimal(time_average[1][0]):time_to_decimal(time_average[1][0])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[1][1])-1:time_to_decimal(time_average[1][1])] = 3
+                    mix_data[j, time_to_decimal(time_average[1][2]):time_to_decimal(time_average[1][2])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[1][3])-1:time_to_decimal(time_average[1][3])] = 3
+                else:
+                    isHoliday = False
+                    mix_data[j, time_to_decimal(time_average[0][0]):time_to_decimal(time_average[0][0])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[0][1])-1:time_to_decimal(time_average[0][1])] = 3
+                    mix_data[j, time_to_decimal(time_average[0][2]):time_to_decimal(time_average[0][2])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[0][3])-1:time_to_decimal(time_average[0][3])] = 3
             else:
-                mix_data[j, time_to_decimal(time_average[1][0]):time_to_decimal(time_average[1][0])+1] = 3
-                mix_data[j, time_to_decimal(time_average[1][1])-1:time_to_decimal(time_average[1][1])] = 3
-                mix_data[j, time_to_decimal(time_average[1][2]):time_to_decimal(time_average[1][2])+1] = 3
-                mix_data[j, time_to_decimal(time_average[1][3])-1:time_to_decimal(time_average[1][3])] = 3
-        print(time_average)
+                if(isHoliday == True):
+                    mix_data[j, time_to_decimal(time_average[1][0]):time_to_decimal(time_average[1][0])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[1][1])-1:time_to_decimal(time_average[1][1])] = 3
+                    mix_data[j, time_to_decimal(time_average[1][2]):time_to_decimal(time_average[1][2])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[1][3])-1:time_to_decimal(time_average[1][3])] = 3
+                else:
+                    mix_data[j, time_to_decimal(time_average[0][0]):time_to_decimal(time_average[0][0])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[0][1])-1:time_to_decimal(time_average[0][1])] = 3
+                    mix_data[j, time_to_decimal(time_average[0][2]):time_to_decimal(time_average[0][2])+1] = 3
+                    mix_data[j, time_to_decimal(time_average[0][3])-1:time_to_decimal(time_average[0][3])] = 3
+                    
     
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
-    plt.imshow(mix_data, cmap=ListedColormap(['#ffffff', '#aacfe5', "#08306b", "#ff0000"]), aspect='auto', interpolation='none')
+    plt.imshow(mix_data, cmap=ListedColormap(['#ffffff', '#aacfe5', "#08306b", "#f172a3"]), aspect='auto', interpolation='none')
 
     # タイトル，軸の設定
-    plt.title(f"Compare({method})")
+    # plt.title(f"Compare({method})")
     # plt.text(260, -1, f"bed time Avg:{time_specified_data[0]}, wake time Avg:{time_specified_data[1]}, \nbed time Thd:{"2" if time_specified_data[2] == "-" else time_specified_data[2]}, wake time Thd:{"2" if time_specified_data[3] == "-" else time_specified_data[3]}, \nstep observation threshold:{step_observation_threshold}", fontsize=7)
     plt.text(260, -1.5, data_info, fontsize=7)
     # plt.text(260, 34.4, f"MSE: {calc_error[0]}\nMAE: {calc_error[1]}", fontsize=7)

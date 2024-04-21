@@ -68,25 +68,25 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
         # 正解率を出力
         accuracy = accuracy_score(extracted_actual_data, extracted_pred_data)
         print("accuracy")
-        print(accuracy)
+        print(format(accuracy, ".2f"))
 
         # 適合率を出力
         precision = precision_score(extracted_actual_data, extracted_pred_data)
         print("precision")
-        print(precision)
+        print(format(precision, ".2f"))
 
         # 再現率を出力
         recall = recall_score(extracted_actual_data, extracted_pred_data)
         print("recall")
-        print(recall)
+        print(format(recall, ".2f"))
 
         # F値を出力-F1-measure
         f1_measure = f1_score(extracted_actual_data, extracted_pred_data)
         print("f1_measure")
-        print(f1_measure)
+        print(format(f1_measure, ".2f"))
 
         # sys.exit()
-        return [accuracy, precision, recall, f1_measure, [actual_data, pred_data, pred_dates]]
+        return [format(accuracy, ".2f"), format(precision, ".2f"), format(recall, ".2f"), format(f1_measure, ".2f"), [actual_data, pred_data, pred_dates]]
     
     else:
         print("正解データが観測されていません．")

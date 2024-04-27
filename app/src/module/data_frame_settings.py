@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
+from datetime import datetime, timedelta
 
 # 推定アルゴリズムに必要なデータフレームなどの設定
 def dataFrameSettings(mode, subject_data):
@@ -23,6 +24,8 @@ def dataFrameSettings(mode, subject_data):
     df = df[df["device"].str.contains("name:iPhone")]
     
     # ヒートマップ用のデータを初期化
-    unique_dates = df['startDate'].dt.date.unique().tolist()
+    # unique_dates = df['startDate'].dt.date.unique().tolist()
+    unique_dates = pd.date_range(start=time["time"]["start_date"], end = datetime.strptime(time["time"]["end_date"], "%Y-%m-%d") - timedelta(days=1)).date
+
     heatmap_data = np.zeros((len(unique_dates), 288))  # 288は24時間 x 60分 / 5分刻み
     return df, unique_dates, heatmap_data

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from datetime import datetime, timedelta
+from src.module.time_function import subtract_time
+import src.module.all_output as allOutput
 
 # データ可視化用の関数
 def dataVisualization(mode, subject_data):
@@ -34,9 +36,14 @@ def dataVisualization(mode, subject_data):
     unique_dates = pd.date_range(start=time["time"]["start_date"], end = datetime.strptime(time["time"]["end_date"], "%Y-%m-%d") - timedelta(days=1)).date
     observed_dates = df['startDate'].dt.date.unique()
     heatmap_data = np.zeros((len(unique_dates), 288))  # 288：24時間 x 60分 / 5分刻み
-
+    print(mode["mode_name"])
+    
+    previous_day_bed = None # 前日の就寝時間を格納する変数(日を跨がない場合)
+    
     # 各行に対して、startDate から endDate の範囲を1に設定
     for i, date in enumerate(unique_dates):
+        raw_time_data = [[], []]
+        actual_time_data = []
         if(len(observed_dates) > 0):
             if date in observed_dates:
                 date_data = df[df['startDate'].dt.date == date]
@@ -44,10 +51,45 @@ def dataVisualization(mode, subject_data):
                     start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
                     end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
                     heatmap_data[i, start_index:end_index + 1] = 1
+                    raw_time_data[0].append((row['startDate']).strftime("%H:%M"))
+                    raw_time_data[1].append((row['endDate']).strftime("%H:%M"))
+
             else:
                 heatmap_data[i, 0:288] = 0
         else:
             heatmap_data[i, 0:288] = 0
+            
+        if(mode["mode_name"] == "sleep"):
+            # print(f"rawdata{raw_time_data[1]}")
+            # print(date)
+            tmp = "00:00" #一つ前の時間の差分用
+            
+            if(previous_day_bed == None):
+                if(len(raw_time_data[0]) > 0):
+                    actual_time_data.append(raw_time_data[0][0])
+            else:
+                actual_time_data.append(previous_day_bed)
+                previous_day_bed = None
+                
+            for j, time in  enumerate(raw_time_data[1]):
+                result = subtract_time(f"{time}:00", f"{tmp}:00")
+                tmp = time
+                if(datetime.strptime(result, '%H:%M:%S') > datetime.strptime("09:30:00", '%H:%M:%S')):
+                        # print(result)
+                        # print(j,time,result) #j-1番目をactual_wakeとする
+                    actual_time_data.append(raw_time_data[1][j-1])
+                    previous_day_bed = raw_time_data[0][j]
+                    # 次の日に[j]をstartとする
+            if(len(actual_time_data) == 1):
+                actual_time_data.append(raw_time_data[1][len(raw_time_data[1])-1])
+            #     print(len(raw_time_data[1])-1)
+            # print(f"result{actual_time_data}")                 
+        # print(f"{date}：{mode["mode_name"]}")
+        # print(f"{raw_time_data[0]}") #min:bed
+        # print(f"{raw_time_data[1]}") #max:wake
+        
+            allOutput.actual_sleep_data[date] = actual_time_data
+    print(allOutput.actual_sleep_data)
                            
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
@@ -81,4 +123,6 @@ def dataVisualization(mode, subject_data):
     date_strings = [date.strftime("%Y-%m-%d") for date in observed_dates]
     for date_str in date_strings:
         file.write(f"{date_str} ")
+    file.write("\n")
+    # 日付データ(フォーマット前)を文字列に変換してリストに格納
     file.close()

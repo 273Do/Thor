@@ -5,10 +5,14 @@ from src.module.draw_heatmap import drawHeatmap, heatmapOfCompareTrueDataAndEsti
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
 from src.module.calculate_error import calculate_error
+import src.module.all_output as allOutput
+from src.module.all_output import append_to_csv
 
 # 正解データを格納したテキストファイルのパス
 actual_data_pass = "./extraction_data/actual_sleep_data.txt"
 pred_data_pass = ""
+
+allOutput.output_data = globals()
 
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
 def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_threshold, subject_data):
@@ -61,6 +65,12 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
         # estimate_index_array = [[], []]
         estimate_index_array = []
         
+        # 統合データ用にオブジェクトへ格納
+        allOutput.output_data.update({
+            "id": subject_data[0],
+            "mode": "Around",
+            "date": date
+        })
               
         if date in df['startDate'].dt.date.unique().tolist():
                 # print(True)
@@ -78,16 +88,28 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
             if(len(bed_date_data) > 0):
                 bed_time = int((bed_date_data['endDate'].max().hour * 60 + bed_date_data['endDate'].max().minute) / 5)
                 estimate_index_array.append(bed_time)
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_bed"] = bed_date_data['endDate'].max().strftime("%H:%M")
             else:
                 estimate_index_array.append(time_to_decimal(bed_time_average[:-3]))
-            
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_bed"] = bed_time_average[:-3]
+
             # 起床時刻を推定
             wake_date_data = date_data[(date_data["startDate"].dt.time >= pd.to_datetime(wake_time_range[0], format='%H:%M:%S').time()) & (date_data["startDate"].dt.time <= pd.to_datetime(wake_time_range[1], format='%H:%M:%S').time())]
             if(len(wake_date_data) > 0):
                 wake_time = int((wake_date_data['startDate'].min().hour * 60 + wake_date_data['startDate'].min().minute) / 5)
                 estimate_index_array.append(wake_time)
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_wake"] = wake_date_data['startDate'].min().strftime("%H:%M")
             else:
                 estimate_index_array.append(time_to_decimal(wake_time_average[:-3]))
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_wake"] = wake_time_average[:-3]
             # print(f"-----------------{date}")
             # print(estimate_index_array)
             
@@ -134,7 +156,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
             #     end_tmp = end_index
             
             # print(previous_day_data["endDate"])
-            
+                        
             # 日をスキップしない場合はヒートマップ用のデータを更新  
             if(is_skip == False):
                 # 平均就寝時間が24時を超えない場合とそうでない場合
@@ -143,17 +165,23 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
             
                     heatmap_data[i, estimate_index_array[0]:288] = 1
                     heatmap_data[i, 0:estimate_index_array[1]] = 1
+                    
                 else:
                     if((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0) & (i > 0)):
-                        heatmap_data[i - 1, int((previous_day_data['endDate'].min().hour * 60 + previous_day_data['endDate'].min().minute) / 5):288] = 1
+                        heatmap_data[i - 1, int((previous_day_data['endDate'].max().hour * 60 + previous_day_data['endDate'].max().minute) / 5):288] = 1
                         heatmap_data[i, 0:estimate_index_array[1]] = 1
+                        
+                        # 統合データ用にオブジェクトへ格納
+                        allOutput.output_data["estimate_bed"] = previous_day_data['endDate'].max().strftime("%H:%M")
                     else:
                         heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
         else:
             # print(False)
             heatmap_data[i, 0:288] = 0
         
-        
+        append_to_csv()
+        # print(allOutput.output_data["id"], allOutput.output_data["mode"], allOutput.output_data["date"], allOutput.output_data["estimate_bed"], allOutput.output_data["estimate_wake"])
+
                 
         previous_day_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time())]
     
@@ -214,6 +242,14 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
         set_wake_range = []
         estimate_index_array = []
         
+           
+        # 統合データ用にオブジェクトへ格納
+        allOutput.output_data.update({
+            "id": subject_data[0],
+            "mode": "Median",
+            "date": date
+        })
+        
         # 日を跨ぐかどうか
         is_cross_day_ = True
          # その日が平日か土日かによって，中央時刻と精査先時刻を設定
@@ -239,6 +275,9 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
                 # end_indexが就寝時間
                 bed_time = int((bed_date_data['endDate'].max().hour * 60 + bed_date_data['endDate'].max().minute) / 5)
                 estimate_index_array.append(bed_time)
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_bed"] = bed_date_data['endDate'].max().strftime("%H:%M")
                 # print(f"bed:{bed_time}")
                 # print(bed_date_data["endDate"].max())
             else:
@@ -249,12 +288,18 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
                     # 前日のデータがある場合に前日のデータを取得精査してヒートマップの形式に変換
                     bed_time=int((previous_day_data_['endDate'].max().hour * 60 + previous_day_data_['endDate'].max().minute) / 5)
                     estimate_index_array.append(bed_time)
+                    
+                    # 統合データ用にオブジェクトへ格納
+                    allOutput.output_data["estimate_bed"] = previous_day_data_['endDate'].max().strftime("%H:%M")
                     # bed_time = int((previous_day_data['endDate'].max().hour * 60 + previous_day_data['endDate'].max().minute) / 5)
                     # estimate_index_array.append(bed_time)
                 else:
                     is_cross_day_  = True
                     # estimate_index_array.append(0)
                     estimate_index_array.append(time_to_decimal(set_bed_range[0]))
+                    
+                    # 統合データ用にオブジェクトへ格納
+                    allOutput.output_data["estimate_bed"] = set_bed_range[0]
                 # print("No data")
         
             # 起床時刻を推定：中央時刻より前のデータを取得
@@ -267,6 +312,9 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
                 wake_time = int((wake_date_data['startDate'].min().hour * 60 + wake_date_data['startDate'].min().minute) / 5)
                 estimate_index_array.append(wake_time)
                 
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_wake"] = wake_date_data['startDate'].min().strftime("%H:%M")
+                
                 # print(f"wake:{wake_time}")
                 # print(wake_date_data["startDate"].max())
             else:
@@ -274,6 +322,9 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
                 # print(time_to_decimal(set_wake_range[0]))
                 # TODO: データがない場合，起床時刻を何に設定するか考える必要がある
                 estimate_index_array.append(time_to_decimal(set_wake_range[1]))
+                
+                # 統合データ用にオブジェクトへ格納
+                allOutput.output_data["estimate_wake"] = set_wake_range[1]
                 #  estimate_index_array.append(time_to_decimal(set_wake_range[1]))
                 # print("No data")
             # for j in range(len(date_data) - 1, -1, -1):
@@ -311,7 +362,9 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
             # print(False)
             heatmap_data[i, 0:288] = 0
             
-        
+        append_to_csv()
+        # print(allOutput.output_data["id"], allOutput.output_data["mode"], allOutput.output_data["date"], allOutput.output_data["estimate_bed"], allOutput.output_data["estimate_wake"])
+
         
         previous_day_data_ = date_data[date_data["endDate"].dt.time >= pd.to_datetime(set_bed_range[1], format='%H:%M').time()]
     

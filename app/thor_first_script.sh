@@ -15,8 +15,8 @@ SECONDS=0
 
 # カレントディレクトリ内のすべてのzipファイルに対して処理を行う
 for file in *; do
-    # ファイル名から空白を削除
 
+    # ファイル名から空白を削除
     mv "$file" $(echo $file | tr -d ' ')
     rename_file=$(echo $file | tr -d ' ')
 
@@ -30,6 +30,7 @@ for file in *; do
     id=${rename//$bed/}
     id=${id//$wake/}
     id=${id//_/}
+    id=${id// /}
     echo "id:$id, bed:$bed, wake:$wake"
 
     # データ自動抽出処理

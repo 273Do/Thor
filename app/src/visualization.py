@@ -48,29 +48,31 @@ def dataVisualization(mode, subject_data):
             if date in observed_dates:
                 date_data = df[df['startDate'].dt.date == date]
                 for _, row in date_data.iterrows():
+                    # startDateとendDateの日付がズレてるものはヒートマップに記載されない
                     start_index = int(((row['startDate'] - pd.Timedelta(days=1)).hour * 60 + (row['startDate'] - pd.Timedelta(days=1)).minute) / 5)
                     end_index = int((row['endDate'].hour * 60 + row['endDate'].minute) / 5)
                     heatmap_data[i, start_index:end_index + 1] = 1
                     raw_time_data[0].append((row['startDate']).strftime("%H:%M"))
                     raw_time_data[1].append((row['endDate']).strftime("%H:%M"))
+                    # print(row['startDate'],row['endDate'])
 
             else:
                 heatmap_data[i, 0:288] = 0
         else:
             heatmap_data[i, 0:288] = 0
             
-        if(mode["mode_name"] == "sleep"):
+        if((mode["mode_name"] == "sleep") and (len(raw_time_data[0]) > 0) and (len(raw_time_data[1]) > 0)):
             # print(f"rawdata{raw_time_data[1]}")
             # print(date)
             tmp = "00:00" #一つ前の時間の差分用
             
             if(previous_day_bed == None):
-                if(len(raw_time_data[0]) > 0):
-                    actual_time_data.append(raw_time_data[0][0])
+                # if(len(raw_time_data[0]) > 0):
+                actual_time_data.append(raw_time_data[0][0])
             else:
                 actual_time_data.append(previous_day_bed)
                 previous_day_bed = None
-                
+            print("生データ"    ,raw_time_data)
             for j, time in  enumerate(raw_time_data[1]):
                 result = subtract_time(f"{time}:00", f"{tmp}:00")
                 tmp = time
@@ -80,7 +82,10 @@ def dataVisualization(mode, subject_data):
                     actual_time_data.append(raw_time_data[1][j-1])
                     previous_day_bed = raw_time_data[0][j]
                     # 次の日に[j]をstartとする
-            if(len(actual_time_data) == 1):
+            print(date,"正解データ",actual_time_data)
+            if((len(actual_time_data) == 1)):
+                print("len1",date)
+                print(raw_time_data)
                 actual_time_data.append(raw_time_data[1][len(raw_time_data[1])-1])
             #     print(len(raw_time_data[1])-1)
             # print(f"result{actual_time_data}")                 
@@ -89,6 +94,7 @@ def dataVisualization(mode, subject_data):
         # print(f"{raw_time_data[1]}") #max:wake
         
             allOutput.actual_sleep_data[date] = actual_time_data
+            # print(date,allOutput.actual_sleep_data[date])
     print(allOutput.actual_sleep_data)
                            
     # ヒートマップの描画

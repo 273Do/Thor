@@ -185,7 +185,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
                     heatmap_data[i, 0:estimate_index_array[1]] = 1
 
                 else:
-                    if ((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0) & (i > 0)):
+                    if ((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0) & (i > 0) & (len(bed_date_data) == 0)):
                         heatmap_data[i - 1, int((previous_day_data['endDate'].max(
                         ).hour * 60 + previous_day_data['endDate'].max().minute) / 5):288] = 1
                         heatmap_data[i, 0:estimate_index_array[1]] = 1
@@ -194,8 +194,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
                         allOutput.output_data["estimate_bed"] = previous_day_data['endDate'].max(
                         ).strftime("%H:%M")
                     else:
-                        heatmap_data[i, estimate_index_array[0]
-                            :estimate_index_array[1]] = 1
+                        heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
         else:
             # print(False)
             heatmap_data[i, 0:288] = 0
@@ -385,8 +384,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
                 heatmap_data[i-1, estimate_index_array[0]:288] = 1
                 heatmap_data[i, 0:estimate_index_array[1]] = 1
             else:
-                heatmap_data[i, estimate_index_array[0]
-                    :estimate_index_array[1]] = 1
+                heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
         else:
             # print(False)
             heatmap_data[i, 0:288] = 0

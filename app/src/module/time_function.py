@@ -78,3 +78,33 @@ def median_time(time_str1, time_str2):
         result_time = result_time - timedelta(hours=12)
 
     return result_time.strftime('%H:%M')
+
+# 時刻のずれを求める関数
+
+
+def shift_time(time_str1, time_str2):
+    # 時間文字列を datetime オブジェクトに変換
+    time1 = datetime.strptime(time_str1, '%H:%M')
+    time2 = datetime.strptime(time_str2, '%H:%M')
+
+    # 時間のずれの値を計算
+    result_time = time1 - time2
+
+    # 時間のずれを示す
+    if (time1 < time2):
+        sift = 1
+        result_time = time2 - time1
+    elif (time1 > time2):
+        sift = -1
+        result_time = time1 - time2
+    else:
+        sift = 0
+        result_time = time1 - time2
+
+    # HH:MM形式でフォーマット
+    total_seconds = int(result_time.total_seconds())
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    formatted_time = f"{hours:02}:{minutes:02}"
+
+    return [sift, formatted_time]

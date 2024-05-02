@@ -50,6 +50,7 @@ def dataVisualization(mode, subject_data):
     for i, date in enumerate(unique_dates):
         raw_time_data = [[], []]
         actual_time_data = []
+        last_step = None
         if (len(observed_dates) > 0):
             if date in observed_dates:
                 date_data = df[df['startDate'].dt.date == date]
@@ -99,7 +100,6 @@ def dataVisualization(mode, subject_data):
                     # 次の日に[j]をstartとする
             print(date, "正解データ", actual_time_data)
             if ((len(actual_time_data) == 1)):
-                print("len1", date)
                 print(raw_time_data)
                 actual_time_data.append(
                     raw_time_data[1][len(raw_time_data[1])-1])
@@ -111,7 +111,53 @@ def dataVisualization(mode, subject_data):
 
             allOutput.actual_sleep_data[date] = actual_time_data
             # print(date,allOutput.actual_sleep_data[date])
-    print(allOutput.actual_sleep_data)
+        print("actual_sleep_data")
+        print(allOutput.actual_sleep_data)
+
+        # 就寝時刻から遡って最初に観測されるステップの時刻を格納
+        if (mode["mode_name"] == "step"):
+
+            # 日が正解睡眠データに含まれている場合のみ処理を行う
+            if (date in allOutput.actual_sleep_data):
+                print("この日はデータあるよ", date)
+                # 正解就寝時刻を取得
+                actual_bed_time = allOutput.actual_sleep_data[date][0]
+                print("正解就寝時刻：", actual_bed_time)
+                # 00:00-正解就寝時刻の[endDate]データを取得して，最大値を最後のステップとする
+                # bed_date_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time()) & (
+                #     date_data["endDate"].dt.time <= pd.to_datetime(bed_time_range[1], format='%H:%M:%S').time())]
+                last_step_data = df[(df['endDate'].dt.date == date) & (df["endDate"].dt.time >= pd.to_datetime("00:00", format='%H:%M').time()) & (
+                    df["endDate"].dt.time <= pd.to_datetime(actual_bed_time, format='%H:%M').time())]
+                # last_step = last_step_data["endDate"].max().strftime("%H:%M")
+                # print("最後のステップデータ一覧：", last_step_data)
+                # print("最後のステップno：", last_step_data["endDate"].max())
+                last_step = last_step_data["endDate"].max()
+
+                # 00:00~正解就寝時刻でデータがない場合
+                if (len(last_step_data) == 0):
+
+                    # 00:00-正解就寝時刻のデータがない場合，前日のデータ(12:00~23:59)を取得
+                    last_step_data = df[(df['endDate'].dt.date == date - timedelta(days=1)) & (df["endDate"].dt.time >= pd.to_datetime("12:00", format='%H:%M').time()) & (
+                        df["endDate"].dt.time <= pd.to_datetime("23:59", format='%H:%M').time())]
+
+                    # last_step = last_step_data["endDate"].max().strftime(
+                    #     "%H:%M")
+
+                    # 12:00~23:59でデータがない場合
+                    if (len(last_step_data) == 0):
+                        last_step = "NoData"
+                    else:
+                        last_step = last_step_data["endDate"].max()
+
+                print("最後のステップデータ一覧：", last_step_data)
+                if (last_step == "NoData"):
+                    print("最後のステップ", last_step)
+                else:
+                    # print("最後のステップaaaa：", last_step)
+                    print("最後のステップ：", last_step.strftime("%H:%M"))
+                    last_step = last_step.strftime("%H:%M")
+
+                allOutput.actual_step_data[date] = last_step
 
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成

@@ -6,6 +6,7 @@ output_data = {
     "mode": None,
     "date": None,
     "last_step": None,
+    "first_step": None,
     "actual_bed": None,
     "actual_wake": None,
     "actual_median": None,
@@ -28,7 +29,8 @@ def append_to_csv():
     # print(output_data["date"] in actual_sleep_data)
     # if(len(actual_sleep_data[output_data["date"]]) != 0):
     if output_data["date"] in actual_sleep_data:
-        output_data["last_step"] = actual_step_data[output_data["date"]]
+        output_data["last_step"] = actual_step_data[output_data["date"]][0]
+        output_data["first_step"] = actual_step_data[output_data["date"]][1]
 
         output_data["actual_bed"] = actual_sleep_data[output_data["date"]][0]
         output_data["actual_wake"] = actual_sleep_data[output_data["date"]][1]
@@ -57,6 +59,7 @@ def append_to_csv():
                     output_data["mode"],
                     output_data["date"],
                     output_data["last_step"],
+                    output_data["first_step"],
                     output_data["actual_bed"],
                     output_data["actual_wake"],
                     output_data["actual_median"],

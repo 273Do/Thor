@@ -4,6 +4,9 @@
 # 処理の実装
 # ./thor_main_script.sh
 
+# 統合データのリセット
+python error.py reset
+
 # データを格納しているフォルダに移動
 cd data
 
@@ -45,8 +48,12 @@ for file in *; do
     count=$(expr $count + 1)
 done
 
+# 誤差，評価を実行
+cd ..
+python3 error.py error
+
 # テキストファイルを削除する．
-rm "../extraction_data/"/*.txt
+rm "extraction_data/"/*.txt
 
 # データの数を出力
 echo "データ量：${count}"

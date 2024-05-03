@@ -4,7 +4,7 @@ from src.module.data_frame_settings import dataFrameSettings
 from src.module.draw_heatmap import drawHeatmap, heatmapOfCompareTrueDataAndEstimatedData
 from src.module.set_reference_time import setReferenceTime
 from src.module.time_function import ConvertToHeatmapCompatible, ConvertToHHMM, time_to_decimal, add_time, subtract_time
-from src.module.calculate_error import calculate_error
+from src.module.evaluation_and_verification import evaluation_and_verification
 import src.module.all_output as allOutput
 from src.module.all_output import append_to_csv
 
@@ -218,7 +218,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, step_observation_thr
     file.close()
 
     # 誤差の計算
-    calc_error = calculate_error(
+    calc_error = evaluation_and_verification(
         actual_data_pass, pred_data_pass, "Around", subject_data)
 
     # -------------------------------------------
@@ -408,7 +408,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, step_observation_t
     file.close()
 
     # 誤差の計算
-    calc_error = calculate_error(
+    calc_error = evaluation_and_verification(
         actual_data_pass, pred_data_pass, f"Median-{method_type}", subject_data)
 
     # -------------------------------------------

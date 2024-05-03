@@ -115,6 +115,7 @@ def dataVisualization(mode, subject_data):
         print(allOutput.actual_sleep_data)
 
         # 就寝時刻から遡って最初に観測されるステップの時刻を格納
+        # 起床時刻から最初に観測されるステップの時刻を格納
         if (mode["mode_name"] == "step"):
 
             # 日が正解睡眠データに含まれている場合のみ処理を行う
@@ -122,16 +123,28 @@ def dataVisualization(mode, subject_data):
                 print("この日はデータあるよ", date)
                 # 正解就寝時刻を取得
                 actual_bed_time = allOutput.actual_sleep_data[date][0]
-                print("正解就寝時刻：", actual_bed_time)
+                actual_wake_time = allOutput.actual_sleep_data[date][1]
+
+                print("正解時刻：", actual_bed_time, actual_wake_time)
                 # 00:00-正解就寝時刻の[endDate]データを取得して，最大値を最後のステップとする
                 # bed_date_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(bed_time_range[0], format='%H:%M:%S').time()) & (
                 #     date_data["endDate"].dt.time <= pd.to_datetime(bed_time_range[1], format='%H:%M:%S').time())]
                 last_step_data = df[(df['endDate'].dt.date == date) & (df["endDate"].dt.time >= pd.to_datetime("00:00", format='%H:%M').time()) & (
                     df["endDate"].dt.time <= pd.to_datetime(actual_bed_time, format='%H:%M').time())]
+
+                first_step_data = df[(df['startDate'].dt.date == date) & (df["startDate"].dt.time >= pd.to_datetime(actual_wake_time, format='%H:%M').time()) & (
+                    df["startDate"].dt.time <= pd.to_datetime("23:59", format='%H:%M').time())]
+
                 # last_step = last_step_data["endDate"].max().strftime("%H:%M")
                 # print("最後のステップデータ一覧：", last_step_data)
                 # print("最後のステップno：", last_step_data["endDate"].max())
                 last_step = last_step_data["endDate"].max()
+                first_step = first_step_data["startDate"].min()
+
+                if (len(first_step_data) == 0):
+                    first_step = "NoData"
+                else:
+                    first_step = first_step.strftime("%H:%M")
 
                 # 00:00~正解就寝時刻でデータがない場合
                 if (len(last_step_data) == 0):
@@ -157,7 +170,8 @@ def dataVisualization(mode, subject_data):
                     print("最後のステップ：", last_step.strftime("%H:%M"))
                     last_step = last_step.strftime("%H:%M")
 
-                allOutput.actual_step_data[date] = last_step
+                # 統合データに格納
+                allOutput.actual_step_data[date] = [last_step, first_step]
 
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成

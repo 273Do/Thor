@@ -6,7 +6,6 @@ import sys
 from src.visualization import dataVisualization
 from src.estimate_sleep_from_step import estimateSleepFromStep_Around, estimateSleepFromStep_Median
 from src.module.time_function import ConvertToH
-from src.module.calculate_error import all_calculate_error
 
 # コマンドライン引数を受け取って処理を行う
 [function, id, bed, wake] = sys.argv
@@ -21,20 +20,15 @@ from src.module.calculate_error import all_calculate_error
 json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
 
-# # 睡眠と歩数の可視化(初期のみ実行)
-# dataVisualization(mode["sleep"], [id, bed, wake])
-# dataVisualization(mode["step"], [id, bed, wake])
+# 睡眠と歩数の可視化(初期のみ実行)
+dataVisualization(mode["sleep"], [id, bed, wake])
+dataVisualization(mode["step"], [id, bed, wake])
 
-# # 回答してもらった時刻をもとに精査する方法
-# estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
-#                              [ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, [id, bed, wake])
+# 回答してもらった時刻をもとに精査する方法
+estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
+                             [ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, [id, bed, wake])
 
 
-# # nhkの調査をもとに精査する方法
-# estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
-#                              [94, 4], [94, 4]], 24, [id, bed, wake])
-
-# 全体の結果を用いた精度の確認をする
-all_calculate_error()
-
-# 全体の結果を用いた起床時刻と就寝時刻の誤差の計算
+# nhkの調査をもとに精査する方法
+estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
+                             [94, 4], [94, 4]], 24, [id, bed, wake])

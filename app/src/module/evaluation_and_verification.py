@@ -3,12 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from src.module.draw_heatmap import confusionMatrixHeatmap
+import pandas as pd
+from datetime import datetime
+from src.module.time_function import shift_time, time_to_minutes
 import sys
 
 # 誤差の計算
 
 
-def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
+def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subject_data):
 
     # ファイルからデータを読み込む
     actual_file = open(actual_data_pass, 'r')
@@ -59,21 +62,21 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
             print("extracted_actual_data書き込み", len(extracted_actual_data))
             # "extraction_data/z_all_output/all_exo"
             file = open(
-                "extraction_data/z_all_output/all_extracted_actual_data.txt", "w")
+                "extraction_data/z_all_output/all_extracted_actual_data.txt", "a")
             for d in (extracted_actual_data):
                 file.write(f"{d} ")
             file.close()
 
             print("extracted_pred_data書き込み", len(extracted_pred_data))
             file = open(
-                "extraction_data/z_all_output/all_extracted_around_pred_data.txt", "w")
+                "extraction_data/z_all_output/all_extracted_around_pred_data.txt", "a")
             for d in (extracted_pred_data):
                 file.write(f"{d} ")
             file.close()
         else:
             print("extracted_pred_data書き込み", len(extracted_pred_data))
             file = open(
-                "extraction_data/z_all_output/all_extracted_median_pred_data.txt", "w")
+                "extraction_data/z_all_output/all_extracted_median_pred_data.txt", "a")
             for d in (extracted_pred_data):
                 file.write(f"{d} ")
             file.close()
@@ -123,7 +126,7 @@ def calculate_error(actual_data_pass, pred_data_pass, method, subject_data):
 # 統合データの混同行列を出力
 
 
-def all_calculate_error():
+def all_evaluation_and_verification():
 
     # ファイルからデータを読み込む
     actual_array = np.loadtxt(
@@ -196,3 +199,86 @@ def evaluate_predictions(actual, pred, method):
 
 
 # all_output_data.csvから，二乗平均誤差と絶対平均誤差を計算する
+def calculate_error():
+
+    df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv",
+                     dtype={"sourceVersion": str, "device": str}, low_memory=False)
+
+    for mode in ["Around", "Median"]:
+        mode_df = df[df["mode"] == mode]
+
+        print(f"{mode}=====================================")
+
+        # 時間差を計算
+        # mode_df['bed_diff_minutes'] = mode_df.apply(lambda row: datetime.strptime(
+        #     shift_time(row['actual_bed'], row['estimate_bed'])[1], "%H:%M").time().strftime("%H:%M"), axis=1)
+        # mode_df['wake_diff_minutes'] = mode_df.apply(lambda row: datetime.strptime(
+        #     shift_time(row['actual_wake'], row['estimate_wake'])[1], "%H:%M").time().strftime("%H:%M"), axis=1)
+
+        # mode_dfの各行に対して時間差を分に変換して格納
+        mode_df['bed_diff_minutes'] = mode_df.apply(lambda row: time_to_minutes(
+            datetime.strptime(shift_time(row['actual_bed'], row['estimate_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+        mode_df['wake_diff_minutes'] = mode_df.apply(lambda row: time_to_minutes(
+            datetime.strptime(shift_time(row['actual_wake'], row['estimate_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+
+        # 中心からのズレを抽出
+        mode_df['median_shift_diff'] = mode_df['shift']
+        mode_df['median_shift_diff_minutes'] = mode_df.apply(lambda row: time_to_minutes(
+            datetime.strptime(row['shift_value'], "%H:%M")), axis=1)
+
+        # mode_df.loc[:, 'bed_diff_minutes'] = mode_df.apply(
+        #     lambda row: time_difference(row['actual_bed'], row['estimate_bed']), axis=1)
+        # mode_df.loc[:, 'wake_diff_minutes'] = mode_df.apply(
+        #     lambda row: time_difference(row['actual_wake'], row['estimate_wake']), axis=1)
+
+        # print(mode_df['bed_diff_minutes'])
+        # print(mode_df['wake_diff_minutes'])
+        # print(mode_df['median_shift_diff'])
+        # print(mode_df['median_shift_diff_minutes'])
+
+        # Mean Squared Error(MSE) を計算
+        mse_bed = np.mean(mode_df['bed_diff_minutes']**2)
+        mse_wake = np.mean(mode_df['wake_diff_minutes']**2)
+        mse_median_shift = np.mean(mode_df['median_shift_diff']**2)
+        mse_median_shift_value = np.mean(
+            mode_df['median_shift_diff_minutes']**2)
+
+        # Mean Absolute Error (MAE) を計算
+        mae_bed = np.mean(np.abs(mode_df['bed_diff_minutes']))
+        mae_wake = np.mean(np.abs(mode_df['wake_diff_minutes']))
+        mae__median_shift = np.mean(mode_df['median_shift_diff'])
+        mae_median_shift_value = np.mean(mode_df['median_shift_diff_minutes'])
+
+        # 結果を出力
+        print("Bed Time MSE:", format(mse_bed, ".2f"))
+        print("Bed Time MAE:", format(mae_bed, ".2f"))
+        print("Wake Time MSE:", format(mse_wake, ".2f"))
+        print("Wake Time MAE:", format(mae_wake, ".2f"))
+        print("Shift MSE:", format(mse_median_shift, ".2f"))
+        print("Shift MAE:", format(mae__median_shift, ".2f"))
+        print("Shift Time MSE:", format(mse_median_shift_value, ".2f"))
+        print("Shift Time MAE:", format(mae_median_shift_value, ".2f"))
+
+# データのリセット
+
+
+def data_reset():
+
+    # データの中身をリセット
+    file = open(
+        "extraction_data/z_all_output/all_extracted_actual_data.txt", "w")
+    file.close()
+    file = open(
+        "extraction_data/z_all_output/all_extracted_around_pred_data.txt", "w")
+    file.close()
+    file = open(
+        "extraction_data/z_all_output/all_extracted_median_pred_data.txt", "w")
+    file.close()
+
+    # CSVファイルを読み込む
+    df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv")
+    # 最初の行だけを取得
+    first_row = df.iloc[:0]
+    # 最初の行のみを含むDataFrameをCSVファイルに上書き保存
+    first_row.to_csv(
+        "extraction_data/z_all_output/all_output_data.csv", index=False)

@@ -15,6 +15,9 @@ from src.module.time_function import ConvertToH
 # エラーハンドリング
 
 # test
+# [id, bed, wake] = ["KY", "0200", "1030"]
+# [id, bed, wake] = ["T05", "0130", "0800"]
+# [id, bed, wake] = ["o13", "0300", "0800"]
 
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')

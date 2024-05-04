@@ -126,7 +126,7 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
 # 統合データの混同行列を出力
 
 
-def all_evaluation_and_verification():
+def allEvaluationAndVerification():
 
     # ファイルからデータを読み込む
     actual_array = np.loadtxt(
@@ -199,7 +199,7 @@ def evaluate_predictions(actual, pred, method):
 
 
 # all_output_data.csvから，二乗平均誤差と絶対平均誤差を計算する
-def calculate_error():
+def calculateError():
 
     df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv",
                      dtype={"sourceVersion": str, "device": str}, low_memory=False)
@@ -262,7 +262,7 @@ def calculate_error():
 # データのリセット
 
 
-def data_reset():
+def dataReset():
 
     # データの中身をリセット
     file = open(

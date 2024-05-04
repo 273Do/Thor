@@ -128,20 +128,42 @@ def time_to_minutes(time_str):
 
 def shift_time(time_str1, time_str2):
     # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M')
-    time2 = datetime.strptime(time_str2, '%H:%M')
+    # time1 = datetime.strptime(time_str1, '%H:%M')
+    # time2 = datetime.strptime(time_str2, '%H:%M')
+
+    # 時間文字列を datetime オブジェクトに変換
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+        time2 = time_str2
+    else:
+        # 入力が文字列の場合、datetimeオブジェクトに変換
+        time1 = datetime.strptime(time_str1, '%H:%M')
+        time2 = datetime.strptime(time_str2, '%H:%M')
+    result_time = 0
 
     # 時間のずれの値を計算
     if (time1 > time2):
-        result_time = time1 - time2
-        shift = 1
+        if ((time1.time() > datetime.strptime("21:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time2.time() > datetime.strptime("21:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+                result_time = time1 - time2
+                shift = -1
+            else:
+                result_time = (time2 + timedelta(days=1)) - time1
+                shift = 1
+        else:
+            result_time = time1 - time2
+            shift = -1
     elif (time1 < time2):
-        result_time = time2 - time1
-        shift = -1
-        # 特定の時間範囲で条件を追加
-        if time2.time() > datetime.strptime("12:00", "%H:%M").time() and time2.time() <= datetime.strptime("23:59", "%H:%M").time():
-            result_time = (datetime.combine(datetime.today(), time1.time(
-            )) + timedelta(days=1)) - datetime.combine(datetime.today(), time2.time())
+        if ((time2.time() > datetime.strptime("21:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time1.time() > datetime.strptime("21:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+                result_time = time2 - time1
+                shift = 1
+            else:
+                result_time = (time1 + timedelta(days=1)) - time2
+                shift = -1
+        else:
+            result_time = time2 - time1
+            shift = 1
     else:
         shift = 0
         result_time = time1 - time2
@@ -151,5 +173,6 @@ def shift_time(time_str1, time_str2):
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
     formatted_time = f"{hours:02}:{minutes:02}"
+    # print(time_str1, time_str2, formatted_time)
 
     return [shift, formatted_time]

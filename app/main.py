@@ -15,8 +15,6 @@ from src.module.time_function import ConvertToH
 # エラーハンドリング
 
 # test
-# [id, bed, wake] = ["KY", "0200", "1030"]
-# [id, bed, wake] = ["T08", "0030", "0830"]
 
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
@@ -27,8 +25,10 @@ dataVisualization(mode["sleep"], [id, bed, wake])
 dataVisualization(mode["step"], [id, bed, wake])
 
 # 回答してもらった時刻をもとに精査する方法
-estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [[ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, [id, bed, wake])
+estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
+                             [ConvertToH(bed), ConvertToH(wake)], [2, 3]], 24, [id, bed, wake])
 
 
 # nhkの調査をもとに精査する方法
-estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [[94, 4], [94, 4]], 24, [id, bed, wake])
+estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
+                             [94, 4], [94, 4]], 24, [id, bed, wake])

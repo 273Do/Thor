@@ -4,6 +4,9 @@
 # 処理の実装
 # ./thor_main_script.sh
 
+# 統合データのリセット
+python error.py reset
+
 # データを格納しているフォルダに移動
 cd data
 
@@ -30,11 +33,12 @@ for file in *; do
 
     # python3 main.py実行時に名前と時刻を指定するようにする．
     # 実行ファイルを実行
+    pwd
     python3 main.py $id $bed $wake
     cd data
 
     #  画像格納用のフォルダを作成して，そこにデータを全て移動
-    mkdir "../extraction_data/$id"_"$bed"_"$wake"
+    # mkdir "../extraction_data/$id"_"$bed"_"$wake"
     mv "../extraction_data"/*.png "../extraction_data/$id"_"$bed"_"$wake"
 
     # 区切り線を表示
@@ -44,8 +48,12 @@ for file in *; do
     count=$(expr $count + 1)
 done
 
+# 誤差，評価を実行
+cd ..
+python3 error.py error
+
 # テキストファイルを削除する．
-rm "../extraction_data/"/*.txt
+rm "extraction_data/"/*.txt
 
 # データの数を出力
 echo "データ量：${count}"

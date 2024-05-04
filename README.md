@@ -1,4 +1,4 @@
-# MyResearch
+<!-- # MyResearch
 
 I am incorporating [**applehealthdata**](https://github.com/tdda/applehealthdata) as part of our research.
 Contains no personal data．
@@ -50,4 +50,4 @@ estimateSleepFromStep(mode, [a, b, c, d], step_observation_threshold, file_name)
 - Fourth argument：File name of the image to output.
 
 > - Supports those whose bedtime is after 00:00. It will not work if it is before the day has passed.
-> - This does not take into account cases where you wake up in the middle of the day (this will be supported in the future).
+> - This does not take into account cases where you wake up in the middle of the day (this will be supported in the future). -->

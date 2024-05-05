@@ -243,6 +243,14 @@ def calculateError():
         mse_median_shift_value = np.mean(
             mode_df['median_shift_diff_minutes']**2)
 
+        # Root Mean Squared Error(RMSE) を計算
+        rmse_bed = np.sqrt(np.mean(mode_df['bed_diff_minutes']**2))
+        rmse_wake = np.sqrt(np.mean(mode_df['wake_diff_minutes']**2))
+        rmse_median_shift = np.sqrt(
+            np.mean(mode_df['median_shift_diff']**2))
+        rmse_median_shift_value = np.sqrt(np.mean(
+            mode_df['median_shift_diff_minutes']**2))
+
         # Mean Absolute Error (MAE) を計算
         mae_bed = np.mean(np.abs(mode_df['bed_diff_minutes']))
         mae_wake = np.mean(np.abs(mode_df['wake_diff_minutes']))
@@ -251,12 +259,16 @@ def calculateError():
 
         # 結果を出力
         print("Bed Time MSE:", format(mse_bed, ".2f"))
+        print("Bed Time RMSE:", format(rmse_bed, ".2f"))
         print("Bed Time MAE:", format(mae_bed, ".2f"))
         print("Wake Time MSE:", format(mse_wake, ".2f"))
+        print("Wake Time RMSE:", format(rmse_wake, ".2f"))
         print("Wake Time MAE:", format(mae_wake, ".2f"))
         print("Shift MSE:", format(mse_median_shift, ".2f"))
+        print("Shift RMSE:", format(rmse_median_shift, ".2f"))
         print("Shift MAE:", format(mae__median_shift, ".2f"))
         print("Shift Time MSE:", format(mse_median_shift_value, ".2f"))
+        print("Shift Time RMSE:", format(rmse_median_shift_value, ".2f"))
         print("Shift Time MAE:", format(mae_median_shift_value, ".2f"))
 
 # データのリセット

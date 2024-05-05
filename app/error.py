@@ -9,12 +9,12 @@ from src.module.time_function import shift_time
 if (mode == "error"):
 
     # 全体の結果を用いた精度の確認をする
-    # allEvaluationAndVerification()
+    allEvaluationAndVerification()
 
-    # # 全体の結果を用いた起床時刻と就寝時刻の誤差の計算
-    # calculateError()
+    # 全体の結果を用いた起床時刻と就寝時刻の誤差の計算
+    calculateError()
 
-    # 回答によるかテーゴリー分け
+    # 回答によるカテゴリー分け
     dataCategorization()
     # shift_time("23:06", "21:48")
 

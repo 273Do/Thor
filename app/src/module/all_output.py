@@ -29,9 +29,13 @@ survey_list = {"survey_0": {'よく持ち歩く': None, '持ち歩く': None, '�
                             'あまり持ち歩かない': None, 'ほとんど持ち歩かない': None},
                "survey_2": {'帰宅後': None, '就寝直前': None,
                             '帰宅して就寝直前までの間': None, 'その他': None},
+               "survey_3": {'就寝直前': None, '15分前程度': None,
+                            '30分前程度': None, '1時間前程度': None, '2時間より以前': None, '充電しない': None},
                "survey_4": {'よく持ち歩く': None, '持ち歩く': None,
                             'あまり持ち歩かない': None, 'ほとんど持ち歩かない': None},
-               "survey_5": {'起床直後': None, '家を出る直後': None, '起床直後から家を出るまでの間': None, 'その他': None}}
+               "survey_5": {'起床直後': None, '家を出る直後': None, '起床直後から家を出るまでの間': None, 'その他': None},
+               "survey_6": {'触らない': None, '15分程度': None,
+                            '30分程度': None, '1時間程度': None, '2時以上': None}, }
 
 # actual_sleep_dataとoutput_dataを紐ずけてcsvファイルに格納する関数
 
@@ -138,7 +142,7 @@ def dataCategorization():
                     survey_list[survey_data][answer] = [
                         format(np.mean(available_laststep_data), ".0f"), format(np.mean(available_firststep_data), ".0f")]
 
-            elif ((survey_data == "survey_1") or (survey_data == "survey_2")):
+            elif ((survey_data == "survey_1") or (survey_data == "survey_2") or (survey_data == "survey_3")):
                 print("就寝間時間の平均値を求める")
                 available_laststep_data = available_laststep_data_df[available_laststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
                     datetime.strptime(shift_time(row['last_step'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)

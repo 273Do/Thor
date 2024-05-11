@@ -53,7 +53,7 @@ def add_time(time_str1, time_str2):
     # 時間の足し算
     result_time = time1 + (time2 - datetime(1900, 1, 1))
 
-    print(result_time)
+    # print(result_time)
 
     # 結果を文字列に変換して返す
     return result_time.strftime('%H:%M:%S')
@@ -85,8 +85,16 @@ def subtract_time(time_str1, time_str2):
 
 def median_time(time_str1, time_str2):
     # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M')
-    time2 = datetime.strptime(time_str2, '%H:%M')
+    # 時間文字列を datetime オブジェクトに変換
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+    else:
+        time1 = datetime.strptime(time_str1, '%H:%M')
+
+    if isinstance(time_str2, datetime):
+        time2 = time_str2
+    else:
+        time2 = datetime.strptime(time_str2, '%H:%M')
 
     # 時間の中央値を計算
     result_time = time1 + (time2 - time1) / 2
@@ -174,6 +182,6 @@ def shift_time(time_str1, time_str2):
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
     formatted_time = f"{hours:02}:{minutes:02}"
-    print(time_str1, time_str2, formatted_time)
+    # print(time_str1, time_str2, formatted_time)
 
     return [shift, formatted_time]

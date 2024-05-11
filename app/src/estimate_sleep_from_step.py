@@ -15,6 +15,11 @@ pred_data_pass = ""
 
 allOutput.output_data = globals()
 
+# 質問リスト
+survey_list_bed = ["survey_0", "survey_1", "survey_2", "survey_3", "composite"]
+survey_list_wake = ["survey_0", "survey_4",
+                    "survey_5", "survey_6", "composite"]
+
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
 
 
@@ -95,7 +100,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
 
             # 就寝時刻を推定
             if (len(bed_date_data) > 0):
-                if (isCorr == True):
+                if ((isCorr == True) & (correction[0] in survey_list_bed)):
                     print("補正モード：大体の時刻から1時間以上前だったら補正")
                     h_e_bed_diff = shift_time(f"{bed_date_data['endDate'].max().hour}:{bed_date_data['endDate'].max().minute}", pd.to_datetime(
                         bed_time_average[:-3], format='%H:%M').time().strftime('%H:%M'))
@@ -138,7 +143,7 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
             wake_date_data = date_data[(date_data["startDate"].dt.time >= pd.to_datetime(wake_time_range[0], format='%H:%M:%S').time()) & (
                 date_data["startDate"].dt.time <= pd.to_datetime(wake_time_range[1], format='%H:%M:%S').time())]
             if (len(wake_date_data) > 0):
-                if (isCorr == True):
+                if ((isCorr == True) & (correction[0] in survey_list_wake)):
                     print("補正モード：大体の時刻から1時間以上前だったら補正")
                     h_e_wake_diff = shift_time(f"{wake_date_data['startDate'].min().hour}:{wake_date_data['startDate'].min().minute}", pd.to_datetime(
                         wake_time_average[:-3], format='%H:%M').time().strftime('%H:%M'))
@@ -190,11 +195,11 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
                 else:
                     # 前日の夜にステップを観測した場合
                     if ((time_specified_data[0][0] - time_specified_data[1][0] < 0) & (len(previous_day_data) > 0) & (i > 0) & (len(bed_date_data) == 0)):
-                        if (isCorr == True):
+                        if ((isCorr == True) & (correction[0] in survey_list_bed)):
                             print("補正モード：大体の時刻から1時間以上前だったら補正")
                             h_e_pre_bed_diff = shift_time(f"{previous_day_data['endDate'].max().hour}:{previous_day_data['endDate'].max().minute}", pd.to_datetime(
                                 bed_time_average[:-3], format='%H:%M').time().strftime('%H:%M'))
-                            if (((datetime.strptime(h_e_pre_bed_diff[1], "%H:%M").time()) > (datetime.strptime("00:10", "%H:%M").time())) & (h_e_pre_bed_diff[0] == 1)):
+                            if (((datetime.strptime(h_e_pre_bed_diff[1], "%H:%M").time()) > (datetime.strptime("01:00", "%H:%M").time())) & (h_e_pre_bed_diff[0] == 1)):
                                 # 推定時間に補正時間を足して時間型にする
                                 pre_bed_time_corr = datetime.strptime(add_time(
                                     previous_day_data['endDate'].max(), f"{minutes_to_time(correction[1])}:00"), "%H:%M:%S")
@@ -203,14 +208,16 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
                                                 60 + pre_bed_time_corr.minute) // 5
 
                                 if ((pre_bed_time >= 0) & (pre_bed_time < 144)):
-                                    print(
-                                        'pre_bed_timeが1~144いないかどうか．それなら日のbedtimeとする，')
-                                   
-                                    heatmap_data[i, pre_bed_time:estimate_index_array[1]] = 1
+                                    # print(
+                                    #     'pre_bed_timeが1~144いないかどうか．それなら日のbedtimeとする，')
+
+                                    heatmap_data[i,
+                                                 pre_bed_time:estimate_index_array[1]] = 1
                                 else:
                                     heatmap_data[i - 1, pre_bed_time:288] = 1
-                                    heatmap_data[i, 0:estimate_index_array[1]] = 1
-                                    
+                                    heatmap_data[i,
+                                                 0:estimate_index_array[1]] = 1
+
                                 # 統合データ用にオブジェクトへ格納
                                 allOutput.output_data["estimate_bed"] = pre_bed_time_corr.strftime(
                                     "%H:%M")
@@ -224,13 +231,12 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
                             allOutput.output_data["estimate_bed"] = previous_day_data['endDate'].max(
                             ).strftime("%H:%M")
                     else:
-                        heatmap_data[i, estimate_index_array[0]
-                            :estimate_index_array[1]] = 1
+                        heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
         else:
             # print(False)
             heatmap_data[i, 0:288] = 0
 
-        appendToCSV()
+        appendToCSV([bed_time_average, wake_time_average])
 
         previous_day_data = date_data[(date_data["endDate"].dt.time >= pd.to_datetime(
             bed_time_range[0], format='%H:%M:%S').time())]
@@ -249,19 +255,27 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
 
     # 誤差の計算
     calc_error = evaluation_and_verification(
-        actual_data_pass, pred_data_pass, "Around", subject_data)
-
-    # -------------------------------------------
-    # ヒートマップの描画
-    data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}"
+        actual_data_pass, pred_data_pass, "Around", subject_data, correction)
     calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
 
-    drawHeatmap("Around", mode, heatmap_data, data_info,
-                calc_info, unique_dates, subject_data[0])
+    if (isCorr == True):
+        # -------------------------------------------
+        # ヒートマップの描画
+        data_info = f"{correction}, \nbed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}"
+        drawHeatmap("Around", mode, heatmap_data, data_info,
+                    calc_info, unique_dates, subject_data[0], correction)
 
-    # 正解データと推定データを比較してヒートマップに表示
-    heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [time_to_decimal(
-        bed_time_average[:-3]), time_to_decimal(wake_time_average[:-3])], data_info, calc_info, "Around", subject_data)
+        # 正解データと推定データを比較してヒートマップに表示
+        heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [time_to_decimal(
+            bed_time_average[:-3]), time_to_decimal(wake_time_average[:-3])], data_info, calc_info, "Around", subject_data, correction)
+    else:
+        data_info = f"bed time Avg:{time_specified_data[0][0]}, wake time Avg:{time_specified_data[0][1]}, \nbed time Thd:{"2" if time_specified_data[1][0] == "-" else time_specified_data[1][0]}, wake time Thd:{"2" if time_specified_data[1][1] == "-" else time_specified_data[1][1]}"
+        drawHeatmap("Around", mode, heatmap_data, data_info,
+                    calc_info, unique_dates, subject_data[0], "")
+
+        # 正解データと推定データを比較してヒートマップに表示
+        heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [time_to_decimal(
+            bed_time_average[:-3]), time_to_decimal(wake_time_average[:-3])], data_info, calc_info, "Around", subject_data, "")
 
 
 # 平均就寝時間と平均起床時間の中央時刻の前後を精査して，歩数から睡眠を推定する関数
@@ -391,12 +405,12 @@ def estimateSleepFromStep_Median(method, time_specified_data, mode_designation, 
                 heatmap_data[i-1, estimate_index_array[0]:288] = 1
                 heatmap_data[i, 0:estimate_index_array[1]] = 1
             else:
-                heatmap_data[i, estimate_index_array[0]:estimate_index_array[1]] = 1
+                heatmap_data[i, estimate_index_array[0]                             :estimate_index_array[1]] = 1
         else:
             # print(False)
             heatmap_data[i, 0:288] = 0
 
-        appendToCSV()
+        appendToCSV("")
         # print(allOutput.output_data["id"], allOutput.output_data["mode"], allOutput.output_data["date"], allOutput.output_data["estimate_bed"], allOutput.output_data["estimate_wake"])
 
         previous_day_data_ = date_data[date_data["endDate"].dt.time >= pd.to_datetime(
@@ -416,7 +430,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, mode_designation, 
 
     # 誤差の計算
     calc_error = evaluation_and_verification(
-        actual_data_pass, pred_data_pass, f"Median-{method_type}", subject_data)
+        actual_data_pass, pred_data_pass, f"Median-{method_type}", subject_data, "")
 
     # -------------------------------------------
     # ヒートマップの描画
@@ -424,8 +438,8 @@ def estimateSleepFromStep_Median(method, time_specified_data, mode_designation, 
     calc_info = f"accuracy:{calc_error[0]}, \nprecision:{calc_error[1]}, \nrecall:{calc_error[2]}, \nf1_measure:{calc_error[3]}\n"
 
     drawHeatmap(f"Median-{method_type}", mode, heatmap_data,
-                data_info, calc_info, unique_dates, subject_data[0])
+                data_info, calc_info, unique_dates, subject_data[0], "")
 
     # 正解データと推定データを比較してヒートマップに表示
     heatmapOfCompareTrueDataAndEstimatedData(calc_error[4][0], calc_error[4][1], calc_error[4][2], [
-                                             weekday_time, holiday_time], data_info, calc_info, method_type, subject_data)
+                                             weekday_time, holiday_time], data_info, calc_info, method_type, subject_data, "")

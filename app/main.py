@@ -15,12 +15,6 @@ from src.module.time_function import ConvertToH, add_time
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング
 
-# test
-# [id, bed, wake] = ["KY", "0200", "1030"]
-# [id, bed, wake] = ["T05", "0130", "0800"]
-# [id, bed, wake] = ["o13", "0300", "0800"]
-[id, bed, wake] = ["T03", "0000", "0930"]
-# ["T03", "0000", "0930"]
 
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
@@ -85,6 +79,28 @@ elif (survey_id in survey_list):
     # nhkの調査をもとに精査する方法
     # estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
     #     [94, 4], [94, 4]], mode_designation, [id, bed, wake])
+
+elif (survey_id == "composite"):
+    # アンケートの結果が最も良かったものを就寝時刻と起床時刻を選択
+    # print("composite")
+
+    correction = [survey_id]
+    most_survey_id = ["survey_2", "survey_0"]
+
+    for i, survey_id in enumerate(most_survey_id):
+        subjects_answers = survey_df[survey_df["id"]
+                                     == id][survey_id].values[0]
+        if i == 0:
+            correction.append(
+                survey_average_time[survey_id][subjects_answers])
+        else:
+            correction.append(
+                survey_average_time[survey_id][subjects_answers][1])
+
+    # print(correction)
+    # sys.exit()
+    estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
+        [ConvertToH(bed), ConvertToH(wake)], [2, 3]], correction, [id, bed, wake])
 
 else:
     print("適切なsurvey_idを入力してください")

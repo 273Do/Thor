@@ -9,9 +9,7 @@
 survey_id="$1"
 
 # 統合データのリセット
-if [ $survey_id = "" ]; then
-    python error.py reset
-fi
+python3 error.py reset rest
 
 # データを格納しているフォルダに移動
 cd data
@@ -46,7 +44,11 @@ for file in *; do
     elif [ $survey_id ]; then
         # 補正モード
         python3 main.py $id $bed $wake $survey_id
-        exit 1
+        # exit 1
+    elif [ $survey_id = "composite" ]; then
+        # 補正モード
+        python3 main.py $id $bed $wake composite
+        # exit 1
     else
         echo "modeが不正です．"
         exit 1
@@ -67,7 +69,7 @@ done
 
 # 誤差，評価を実行
 cd ..
-python3 error.py error
+python3 error.py error $survey_id
 
 # テキストファイルを削除する．
 rm "extraction_data/"/*.txt

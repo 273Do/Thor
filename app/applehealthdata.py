@@ -22,10 +22,10 @@ __version__ = '1.3'
 RECORD_FIELDS = OrderedDict((
     # ('sourceName', 's'),
     ('sourceVersion', 's'),
-    ('device', 's'),
-    ('type', 's'),
-    ('unit', 's'),
-    ('creationDate', 'd'),
+    # ('device', 's'),
+    # ('type', 's'),
+    # ('unit', 's'),
+    # ('creationDate', 'd'),
     ('startDate', 'd'),
     ('endDate', 'd'),
     ('value', 'n'),
@@ -68,6 +68,7 @@ FIELDS = {
 PREFIX_RE = re.compile('^HK.*TypeIdentifier(.+)$')
 ABBREVIATE = True
 VERBOSE = True
+
 
 def format_freqs(counter):
     """
@@ -115,7 +116,6 @@ def encode(s):
     return s.encode('UTF-8') if sys.version_info.major < 3 else s
 
 
-
 class HealthDataExtractor(object):
     """
     Extract health data from Apple Health App's XML export, export.xml.
@@ -129,6 +129,7 @@ class HealthDataExtractor(object):
         directory as the input export.xml. Reports each file written
         unless verbose has been set to False.
     """
+
     def __init__(self, path, verbose=VERBOSE):
         self.in_path = path
         self.verbose = verbose
@@ -195,7 +196,7 @@ class HealthDataExtractor(object):
             path = os.path.join(self.directory, '%s.csv' % abbreviate(kind))
             f = open(path, 'w')
             headerType = (kind if kind in ('Workout', 'ActivitySummary')
-                               else 'Record')
+                          else 'Record')
             f.write(','.join(FIELDS[headerType].keys()) + '\n')
             self.handles[kind] = f
             self.report('Opening %s for writing' % path)

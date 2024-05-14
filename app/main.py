@@ -15,7 +15,6 @@ from src.module.time_function import ConvertToH, add_time
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング
 
-
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
 mode = json.load(json_open)
@@ -33,6 +32,7 @@ survey_average_time = json.load(json_open)
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
 dataVisualization(mode["sleep"], [id, bed, wake])
+# sys.exit()
 dataVisualization(mode["step"], [id, bed, wake])
 
 # 通常モード
@@ -85,17 +85,17 @@ elif (survey_id == "composite"):
     # print("composite")
 
     correction = [survey_id]
-    most_survey_id = ["survey_2", "survey_0"]
+    most_survey_id = ["survey_0", "survey_6"]
 
     for i, survey_id in enumerate(most_survey_id):
         subjects_answers = survey_df[survey_df["id"]
                                      == id][survey_id].values[0]
         if i == 0:
             correction.append(
-                survey_average_time[survey_id][subjects_answers])
+                survey_average_time[survey_id][subjects_answers][1])
         else:
             correction.append(
-                survey_average_time[survey_id][subjects_answers][1])
+                survey_average_time[survey_id][subjects_answers])
 
     # print(correction)
     # sys.exit()

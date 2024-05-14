@@ -78,6 +78,7 @@ def subtract_time(time_str1, time_str2):
     result_time = time1 - (time2 - datetime(1900, 1, 1))
 
     # 結果を文字列に変換して返す
+    print(time_str1, time_str2, result_time)
     return result_time.strftime('%H:%M:%S')
 
 # 時間の中央値を求める関数
@@ -152,8 +153,8 @@ def shift_time(time_str1, time_str2):
 
     # 時間のずれの値を計算
     if (time1 > time2):
-        if ((time1.time() > datetime.strptime("21:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
-            if ((time2.time() > datetime.strptime("21:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+        if ((time1.time() > datetime.strptime("20:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time2.time() > datetime.strptime("20:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
                 result_time = time1 - time2
                 shift = -1
             else:
@@ -163,8 +164,8 @@ def shift_time(time_str1, time_str2):
             result_time = time1 - time2
             shift = -1
     elif (time1 < time2):
-        if ((time2.time() > datetime.strptime("21:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
-            if ((time1.time() > datetime.strptime("21:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+        if ((time2.time() > datetime.strptime("20:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time1.time() > datetime.strptime("20:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
                 result_time = time2 - time1
                 shift = 1
             else:

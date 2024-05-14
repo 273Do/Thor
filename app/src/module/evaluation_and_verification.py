@@ -186,7 +186,7 @@ def evaluate_predictions(actual, pred, method):
 
     data_info = f"data count:{len(actual)}"
     # plt.title(f'Estimation Sleep ({method})')
-    # plt.text(1.65, -0.55, data_info, fontsize=7)
+    plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')

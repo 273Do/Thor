@@ -58,7 +58,7 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data, co
     plt.imshow(confusion_matrix, cmap='Blues', interpolation='nearest')
 
     # plt.title(f'Estimation Sleep ({method})')
-    # plt.text(1.65, -0.55, data_info, fontsize=7)
+    plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')

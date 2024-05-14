@@ -96,7 +96,9 @@ def dataVisualization(mode, subject_data):
                     # print(result)
                     # print(j,time,result) #j-1番目をactual_wakeとする
                     actual_time_data.append(raw_time_data[1][j-1])
-                    previous_day_bed = raw_time_data[0][j]
+                    if (datetime.strptime(f"{raw_time_data[0][j]}:00", '%H:%M:%S') > datetime.strptime("21:00:00", '%H:%M:%S')):
+                        previous_day_bed = raw_time_data[0][j]
+                        print(f"前の日{previous_day_bed}")
                     # 次の日に[j]をstartとする
             print(date, "正解データ", actual_time_data)
             if ((len(actual_time_data) == 1)):

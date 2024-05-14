@@ -7,7 +7,12 @@ from datetime import datetime
 # ヒートマップの描画
 
 
-def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, file_name):
+def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, file_name, correction):
+    if (type(correction) == list):
+        answer = f"_{correction[0]}"
+    else:
+        answer = ""
+
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
     plt.imshow(heatmap_data, cmap=ListedColormap(
@@ -36,12 +41,17 @@ def drawHeatmap(method, mode, heatmap_data, data_info, calc_info, unique_dates, 
     cbar.set_label(mode["color_bar"]["label"])
 
     # グラフを保存
-    plt.savefig(f"{mode["metadata"]["image_name"]}_{method}_{file_name}.png")
+    plt.savefig(f"{mode["metadata"]["image_name"]}_{method}_{file_name}{answer}.png")
 
 # 混同行列のヒートマップの描画
 
 
-def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
+def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data, correction):
+    if (type(correction) == list):
+        answer = f"_{correction[0]}"
+    else:
+        answer = ""
+
     # ヒートマップの描画
     plt.figure()  # 新しいFigureを作成
 
@@ -49,7 +59,7 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
 
     # plt.title(f'Estimation Sleep ({method})')
     plt.text(1.65, -0.55, data_info, fontsize=7)
-    plt.colorbar(label='Count')
+    plt.colorbar(label='')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
     plt.xticks(ticks=[0, 1], labels=['Positive', 'Negative'])
@@ -57,16 +67,21 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data):
 
     for i in range(2):
         for j in range(2):
+            text_color = 'white' if confusion_matrix[i, j] >= 0.5 else 'black'
             plt.text(j, i, format(
-                confusion_matrix[i, j], ".2f"), ha='center', va='center', color='black')
+                confusion_matrix[i, j], ".2f"), ha='center', va='center', color=text_color)
 
     plt.savefig(
-        f'extraction_data/confusion_matrix_{method}_{subject_data[0]}.png')
+        f'extraction_data/confusion_matrix_{method}_{subject_data[0]}{answer}.png')
 
 # 正解データと推定データの比較のヒートマップの描画
 
 
-def heatmapOfCompareTrueDataAndEstimatedData(actual_data, pred_data, pred_dates, time_average,  data_info, calc_info, method, subject_data):
+def heatmapOfCompareTrueDataAndEstimatedData(actual_data, pred_data, pred_dates, time_average,  data_info, calc_info, method, subject_data, correction):
+    if (type(correction) == list):
+        answer = f"_{correction[0]}"
+    else:
+        answer = ""
 
     # データを区別するため2をかける
     actual_data = actual_data * 2
@@ -164,4 +179,5 @@ def heatmapOfCompareTrueDataAndEstimatedData(actual_data, pred_data, pred_dates,
     cbar.set_label("Sleep Status")
 
     # グラフを保存
-    plt.savefig(f"extraction_data/compare_{method}_{subject_data[0]}.png")
+    plt.savefig(
+        f"extraction_data/compare_{method}_{subject_data[0]}{answer}.png")

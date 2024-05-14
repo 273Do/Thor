@@ -11,7 +11,7 @@ import sys
 # 誤差の計算
 
 
-def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subject_data):
+def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subject_data, correction):
 
     # ファイルからデータを読み込む
     actual_file = open(actual_data_pass, 'r')
@@ -60,7 +60,6 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
         # ここで01の統合データ(extracted_actual_dataとextracted_pred_data)に書き込みをする
         if (method == "Around"):
             print("extracted_actual_data書き込み", len(extracted_actual_data))
-            # "extraction_data/z_all_output/all_exo"
             file = open(
                 "extraction_data/z_all_output/all_extracted_actual_data.txt", "a")
             for d in (extracted_actual_data):
@@ -94,7 +93,8 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
         # normalized_cm = cm / row_sums
 
         data_info = f"valid date count:{len(actual_dates)}, \ndata count:{len(extracted_actual_data)}"
-        confusionMatrixHeatmap(np.array(cm), method, data_info, subject_data)
+        confusionMatrixHeatmap(np.array(cm), method,
+                               data_info, subject_data, correction)
 
         # 正解率を出力
         accuracy = accuracy_score(extracted_actual_data, extracted_pred_data)
@@ -126,7 +126,7 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
 # 統合データの混同行列を出力
 
 
-def all_evaluation_and_verification():
+def allEvaluationAndVerification(survey_id):
 
     # ファイルからデータを読み込む
     actual_array = np.loadtxt(
@@ -141,13 +141,17 @@ def all_evaluation_and_verification():
     # median_pred_cm = confusion_matrix(actual_array, median_pred_array,
     #                                   labels=[1, 0], normalize='true')
 
-    print("around=====================================")
-    evaluate_predictions(actual_array, around_pred_array, "Around")
-    print("median=====================================")
-    evaluate_predictions(actual_array, median_pred_array, "Median")
+    if (survey_id == ""):
+        print("around=====================================")
+        evaluate_predictions(actual_array, around_pred_array, "Around")
+        print("median=====================================")
+        evaluate_predictions(actual_array, median_pred_array, "Median")
+    else:
+        evaluate_predictions(
+            actual_array, around_pred_array, f"Around_{survey_id}")
+        # 評価を行う関数
 
 
-# 評価を行う関数
 def evaluate_predictions(actual, pred, method):
 
     print("cm")
@@ -183,7 +187,7 @@ def evaluate_predictions(actual, pred, method):
     data_info = f"data count:{len(actual)}"
     # plt.title(f'Estimation Sleep ({method})')
     plt.text(1.65, -0.55, data_info, fontsize=7)
-    plt.colorbar(label='Count')
+    plt.colorbar(label='')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
     plt.xticks(ticks=[0, 1], labels=['Positive', 'Negative'])
@@ -191,20 +195,25 @@ def evaluate_predictions(actual, pred, method):
 
     for i in range(2):
         for j in range(2):
+            text_color = 'white' if np.array(cm)[i, j] >= 0.5 else 'black'
             plt.text(j, i, format(
-                np.array(cm)[i, j], ".2f"), ha='center', va='center', color='black')
+                np.array(cm)[i, j], ".2f"), ha='center', va='center', color=text_color)
 
     plt.savefig(
         f'extraction_data/z_all_output/confusion_matrix_all_{method}_pred.png')
 
 
 # all_output_data.csvから，二乗平均誤差と絶対平均誤差を計算する
-def calculate_error():
+def calculateError(survey_id):
+    if (survey_id == ""):
+        mode_list = ["Around", "Median"]
+    else:
+        mode_list = ["Around"]
 
     df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv",
                      dtype={"sourceVersion": str, "device": str}, low_memory=False)
 
-    for mode in ["Around", "Median"]:
+    for mode in mode_list:
         mode_df = df[df["mode"] == mode]
 
         print(f"{mode}=====================================")
@@ -243,6 +252,14 @@ def calculate_error():
         mse_median_shift_value = np.mean(
             mode_df['median_shift_diff_minutes']**2)
 
+        # Root Mean Squared Error(RMSE) を計算
+        rmse_bed = np.sqrt(np.mean(mode_df['bed_diff_minutes']**2))
+        rmse_wake = np.sqrt(np.mean(mode_df['wake_diff_minutes']**2))
+        rmse_median_shift = np.sqrt(
+            np.mean(mode_df['median_shift_diff']**2))
+        rmse_median_shift_value = np.sqrt(np.mean(
+            mode_df['median_shift_diff_minutes']**2))
+
         # Mean Absolute Error (MAE) を計算
         mae_bed = np.mean(np.abs(mode_df['bed_diff_minutes']))
         mae_wake = np.mean(np.abs(mode_df['wake_diff_minutes']))
@@ -250,19 +267,37 @@ def calculate_error():
         mae_median_shift_value = np.mean(mode_df['median_shift_diff_minutes'])
 
         # 結果を出力
-        print("Bed Time MSE:", format(mse_bed, ".2f"))
-        print("Bed Time MAE:", format(mae_bed, ".2f"))
-        print("Wake Time MSE:", format(mse_wake, ".2f"))
-        print("Wake Time MAE:", format(mae_wake, ".2f"))
-        print("Shift MSE:", format(mse_median_shift, ".2f"))
-        print("Shift MAE:", format(mae__median_shift, ".2f"))
-        print("Shift Time MSE:", format(mse_median_shift_value, ".2f"))
-        print("Shift Time MAE:", format(mae_median_shift_value, ".2f"))
+        # print("Bed Time MSE:", format(mse_bed, ".2f"))
+        # print("Bed Time RMSE:", format(rmse_bed, ".2f"))
+        # print("Bed Time MAE:", format(mae_bed, ".2f"))
+        # print("Wake Time MSE:", format(mse_wake, ".2f"))
+        # print("Wake Time RMSE:", format(rmse_wake, ".2f"))
+        # print("Wake Time MAE:", format(mae_wake, ".2f"))
+        # print("Shift MSE:", format(mse_median_shift, ".2f"))
+        # print("Shift RMSE:", format(rmse_median_shift, ".2f"))
+        # print("Shift MAE:", format(mae__median_shift, ".2f"))
+        # print("Shift Time MSE:", format(mse_median_shift_value, ".2f"))
+        # print("Shift Time RMSE:", format(rmse_median_shift_value, ".2f"))
+        # print("Shift Time MAE:", format(mae_median_shift_value, ".2f"))
+        # 値だけを出力するように print 文を修正
+        print(format(mse_bed, ".2f"))
+        print(format(rmse_bed, ".2f"))
+        print(format(mae_bed, ".2f"))
+        print(format(mse_wake, ".2f"))
+        print(format(rmse_wake, ".2f"))
+        print(format(mae_wake, ".2f"))
+        print(format(mse_median_shift, ".2f"))
+        print(format(rmse_median_shift, ".2f"))
+        print(format(mae__median_shift, ".2f"))
+        print(format(mse_median_shift_value, ".2f"))
+        print(format(rmse_median_shift_value, ".2f"))
+        print(format(mae_median_shift_value, ".2f"))
+
 
 # データのリセット
 
 
-def data_reset():
+def dataReset():
 
     # データの中身をリセット
     file = open(

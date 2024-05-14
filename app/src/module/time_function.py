@@ -38,12 +38,22 @@ def time_to_decimal(time_str):
 
 
 def add_time(time_str1, time_str2):
-    # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M:%S')
-    time2 = datetime.strptime(time_str2, '%H:%M:%S')
+   # 時間文字列を datetime オブジェクトに変換
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+
+    else:
+        time1 = datetime.strptime(time_str1, '%H:%M:%S')
+
+    if isinstance(time_str2, datetime):
+        time2 = time_str2
+    else:
+        time2 = datetime.strptime(time_str2, '%H:%M:%S')
 
     # 時間の足し算
     result_time = time1 + (time2 - datetime(1900, 1, 1))
+
+    # print(result_time)
 
     # 結果を文字列に変換して返す
     return result_time.strftime('%H:%M:%S')
@@ -53,13 +63,22 @@ def add_time(time_str1, time_str2):
 
 def subtract_time(time_str1, time_str2):
     # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M:%S')
-    time2 = datetime.strptime(time_str2, '%H:%M:%S')
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+
+    else:
+        time1 = datetime.strptime(time_str1, '%H:%M:%S')
+
+    if isinstance(time_str2, datetime):
+        time2 = time_str2
+    else:
+        time2 = datetime.strptime(time_str2, '%H:%M:%S')
 
     # 時間の引き算
     result_time = time1 - (time2 - datetime(1900, 1, 1))
 
     # 結果を文字列に変換して返す
+    print(time_str1, time_str2, result_time)
     return result_time.strftime('%H:%M:%S')
 
 # 時間の中央値を求める関数
@@ -67,8 +86,16 @@ def subtract_time(time_str1, time_str2):
 
 def median_time(time_str1, time_str2):
     # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M')
-    time2 = datetime.strptime(time_str2, '%H:%M')
+    # 時間文字列を datetime オブジェクトに変換
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+    else:
+        time1 = datetime.strptime(time_str1, '%H:%M')
+
+    if isinstance(time_str2, datetime):
+        time2 = time_str2
+    else:
+        time2 = datetime.strptime(time_str2, '%H:%M')
 
     # 時間の中央値を計算
     result_time = time1 + (time2 - time1) / 2
@@ -80,7 +107,7 @@ def median_time(time_str1, time_str2):
     return result_time.strftime('%H:%M')
 
 
-# 時間差を分に変換する関数
+# 時間を分に変換する関数
 def time_to_minutes(time_str):
     # 時間文字列を datetime オブジェクトに変換
     if isinstance(time_str, datetime):
@@ -91,57 +118,62 @@ def time_to_minutes(time_str):
     # 時間を分に変換 (時間 * 60 + 分)
     return time_obj.hour * 60 + time_obj.minute
 
+# 分を時間に変換する関数
+
+
+def minutes_to_time(minutes):
+    minutes = int(minutes)
+    # 分を時間と分に変換
+    hours = minutes // 60
+    minutes = minutes % 60
+    # HH:MM形式でフォーマット
+    return f"{hours:02}:{minutes:02}"
+
 # 時刻のずれを求める関数
 
 
-# def shift_time(time_str1, time_str2):
-#     # 時間文字列を datetime オブジェクトに変換
-#     time1 = datetime.strptime(time_str1, '%H:%M')
-#     time2 = datetime.strptime(time_str2, '%H:%M')
-
-#     # 時間のずれの値を計算
-#     result_time = time1 - time2
-
-#     # 時間のずれを示す
-#     if (time1 < time2):
-#         if ((time2 > datetime.strptime("12:00", "%H:%M")) & (time2 <= datetime.strptime("23:59", "%H:%M"))):
-#             sift = -1
-#             result_time = (datetime.strptime("00:00", "%H:%M") +
-#                            timedelta(days=1)) - time2 + time1
-#         else:
-#             sift = 1
-#             result_time = time2 - time1
-#     elif (time1 > time2):
-#         sift = -1
-#         result_time = time1 - time2
-#     else:
-#         sift = 0
-#         result_time = time1 - time2
-
-#     # HH:MM形式でフォーマット
-#     total_seconds = int(result_time.total_seconds())
-#     hours = total_seconds // 3600
-#     minutes = (total_seconds % 3600) // 60
-#     formatted_time = f"{hours:02}:{minutes:02}"
-
-#     return [sift, formatted_time]
-
 def shift_time(time_str1, time_str2):
     # 時間文字列を datetime オブジェクトに変換
-    time1 = datetime.strptime(time_str1, '%H:%M')
-    time2 = datetime.strptime(time_str2, '%H:%M')
+    # time1 = datetime.strptime(time_str1, '%H:%M')
+    # time2 = datetime.strptime(time_str2, '%H:%M')
+
+    # 時間文字列を datetime オブジェクトに変換
+    if isinstance(time_str1, datetime):
+        time1 = time_str1
+
+    else:
+        time1 = datetime.strptime(time_str1, '%H:%M')
+
+    if isinstance(time_str2, datetime):
+        time2 = time_str2
+    else:
+        time2 = datetime.strptime(time_str2, '%H:%M')
+
+    result_time = 0
 
     # 時間のずれの値を計算
     if (time1 > time2):
-        result_time = time1 - time2
-        shift = 1
+        if ((time1.time() > datetime.strptime("20:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time2.time() > datetime.strptime("20:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+                result_time = time1 - time2
+                shift = -1
+            else:
+                result_time = (time2 + timedelta(days=1)) - time1
+                shift = 1
+        else:
+            result_time = time1 - time2
+            shift = -1
     elif (time1 < time2):
-        result_time = time2 - time1
-        shift = -1
-        # 特定の時間範囲で条件を追加
-        if time2.time() > datetime.strptime("12:00", "%H:%M").time() and time2.time() <= datetime.strptime("23:59", "%H:%M").time():
-            result_time = (datetime.combine(datetime.today(), time1.time(
-            )) + timedelta(days=1)) - datetime.combine(datetime.today(), time2.time())
+        if ((time2.time() > datetime.strptime("20:00", "%H:%M").time()) and (time2.time() <= datetime.strptime("23:59", "%H:%M").time())):
+            if ((time1.time() > datetime.strptime("20:00", "%H:%M").time()) and (time1.time() <= datetime.strptime("23:59", "%H:%M").time())):
+                result_time = time2 - time1
+                shift = 1
+            else:
+                result_time = (time1 + timedelta(days=1)) - time2
+                shift = -1
+        else:
+            result_time = time2 - time1
+            shift = 1
     else:
         shift = 0
         result_time = time1 - time2
@@ -151,5 +183,6 @@ def shift_time(time_str1, time_str2):
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
     formatted_time = f"{hours:02}:{minutes:02}"
+    # print(time_str1, time_str2, formatted_time)
 
     return [shift, formatted_time]

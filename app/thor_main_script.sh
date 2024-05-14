@@ -4,8 +4,12 @@
 # 処理の実装
 # ./thor_main_script.sh
 
+# コマンドライン引数を受け取って処理を行う
+# 質問番号を指定
+survey_id="$1"
+
 # 統合データのリセット
-python error.py reset
+python3 error.py reset rest
 
 # データを格納しているフォルダに移動
 cd data
@@ -33,8 +37,23 @@ for file in *; do
 
     # python3 main.py実行時に名前と時刻を指定するようにする．
     # 実行ファイルを実行
-    pwd
-    python3 main.py $id $bed $wake
+    if [ $survey_id = "normal" ]; then
+        # 通常モード
+        python3 main.py $id $bed $wake normal
+        echo $survey_id
+    elif [ $survey_id ]; then
+        # 補正モード
+        python3 main.py $id $bed $wake $survey_id
+        # exit 1
+    elif [ $survey_id = "composite" ]; then
+        # 補正モード
+        python3 main.py $id $bed $wake composite
+        # exit 1
+    else
+        echo "modeが不正です．"
+        exit 1
+    fi
+
     cd data
 
     #  画像格納用のフォルダを作成して，そこにデータを全て移動
@@ -50,7 +69,7 @@ done
 
 # 誤差，評価を実行
 cd ..
-python3 error.py error
+python3 error.py error $survey_id
 
 # テキストファイルを削除する．
 rm "extraction_data/"/*.txt

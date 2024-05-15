@@ -1,5 +1,6 @@
 .DS_Store
 
+app/all_data/
 app/data/
 app/export_zip/
 app/extraction_data/

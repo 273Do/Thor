@@ -206,6 +206,5 @@ def dataCategorization():
                     survey_list[survey_data][answer] = format(np.mean(
                         available_firststep_data), ".0f")
 
-    # #print(survey_list)
     with open('extraction_data/z_all_output/data_categorization.json', 'w') as f:
         json.dump(survey_list, f, indent=2, ensure_ascii=False)

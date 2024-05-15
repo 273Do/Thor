@@ -9,11 +9,13 @@ from src.estimate_sleep_from_step import estimateSleepFromStep_Around, estimateS
 from src.module.time_function import ConvertToH, add_time
 
 # コマンドライン引数を受け取って処理を行う
-[function, id, bed, wake, survey_id] = sys.argv
+# [function, id, bed, wake, survey_id] = sys.argv
 # print(f"id:{id}, bed:{bed}, wake:{wake}")
 
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング
+# test
+
 
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
@@ -32,8 +34,9 @@ survey_average_time = json.load(json_open)
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
 dataVisualization(mode["sleep"], [id, bed, wake])
-# sys.exit()
+
 dataVisualization(mode["step"], [id, bed, wake])
+sys.exit()
 
 # 通常モード
 if (survey_id == "normal"):

@@ -14,7 +14,6 @@ from src.module.time_function import ConvertToH, add_time
 
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング
-# test
 
 
 # モードの設定ファイルを読み込む

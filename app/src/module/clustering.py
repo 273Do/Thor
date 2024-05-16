@@ -9,6 +9,7 @@ from sklearn.cluster import KMeans
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from set_reference_time import setReferenceTime
+from time_function import shift_time, subtract_time
 
 # kmeansのチュートリアル
 # url = "https://raw.githubusercontent.com/maskot1977/ipython_notebook/master/toydata/iris.txt"
@@ -88,33 +89,83 @@ def clustering():
                         # 土日
                         start_time = holiday_time[0]
                         end_time = holiday_time[1]
+                        staying_up_late_end_time = holiday_time[3]
                     else:
                         # 平日
                         start_time = weekday_time[0]
                         end_time = weekday_time[1]
+                        staying_up_late_end_time = weekday_time[3]
 
                     # 文字列を時間に変換
                     start_time = pd.to_datetime(start_time)
                     end_time = pd.to_datetime(end_time)
+                    staying_up_late_end_time = pd.to_datetime(
+                        staying_up_late_end_time)
 
                     # 指定した時間範囲のデータを抽出
-                    df = df[(df["startDate"].dt.time >= start_time.time())
-                            & (df["startDate"].dt.time <= end_time.time())]
+                    df_clustering = df[(df["startDate"].dt.time >= start_time.time())
+                                       & (df["startDate"].dt.time <= end_time.time())]
 
                     # 歩数の合計
-                    sum_step = df[df['startDate'].dt.date ==
-                                  date]['value'].sum()
+                    sum_step = df_clustering[df_clustering['startDate'].dt.date ==
+                                             date]['value'].sum()
 
                     # データの数
-                    data_count = df[df['startDate'].dt.date == date].shape[0]
+                    data_count = df_clustering[df_clustering['startDate'].dt.date == date].shape[0]
 
                     # 3~4時からまでの中にデータがなければ夜更かし疑惑がある．
-                    # 21時(5%%の時刻)まで睡眠時間を推定する
+                    # 21時(5%の時刻)まで睡眠時間を推定する
 
-                    staying_up_late = False
+                    # 夜更かしを検知した(3~4時にステップあり)の場合の推定睡眠時刻を格納する変数
+                    staying_up_late_bed = False
+                    staying_up_late_wake = False
+
+                    time_interval = 0
+                    staying_up_late = []
+
                     if (data_count > 0):
-                        staying_up_late = True
-                    # print("就寝時刻を推定する時のみ")
+
+                        staying_up_late_bed = True
+                        staying_up_late_wake = True
+
+                        # print("就寝時刻を推定する時のみ")
+                        # 右側を辿ってステップの間隔が最も大きいものを睡眠時間とする
+                        df_stayingUpLate = df[(df["startDate"].dt.time >= start_time.time()) & (
+                            df["endDate"].dt.time <= staying_up_late_end_time.time())]
+
+                        date_data = df_stayingUpLate[df_stayingUpLate['startDate'].dt.date == date]
+                        print(f"データあり{file_name[:3].replace("_", "")}_{date}")
+
+                        # 前のendDateを格納数する変数
+                        prev_end_time = pd.to_datetime(start_time)
+                        tmp_estimate_sleep_time = pd.to_datetime(
+                            "00:00:00").time()
+                        tmp_bed_wake_time = []
+                        for i, row in date_data.iterrows():
+                            # print(row["startDate"], row["endDate"])
+                            time_interval = subtract_time(f"{row["startDate"].hour}:{row["startDate"].minute}:00", f"{prev_end_time.hour}:{prev_end_time.minute}:00")
+
+                            estimate_sleep_time = pd.to_datetime(
+                                time_interval).time()
+
+                            print(estimate_sleep_time,  f"{prev_end_time.hour}:{prev_end_time.minute}", f"{row["startDate"].hour}:{row["startDate"].minute}")
+
+                            if (tmp_estimate_sleep_time < estimate_sleep_time):
+                                tmp_estimate_sleep_time = estimate_sleep_time
+                                print("更新")
+                                tmp_bed_wake_time = [f"{prev_end_time.hour}:{prev_end_time.minute}", f"{row["startDate"].hour}:{row["startDate"].minute}"]
+                            prev_end_time = row["endDate"]
+
+                        # print(
+                        #     f"結果{tmp_estimate_sleep_time},{tmp_bed_wake_time}")
+
+                        staying_up_late = [
+                            tmp_estimate_sleep_time] + tmp_bed_wake_time
+                    print(staying_up_late)
+
+                    if (len(staying_up_late) != 0):
+                        staying_up_late_bed = staying_up_late[1]
+                        staying_up_late_wake = staying_up_late[2]
 
                     # これらをcsvに書き込む
 
@@ -122,7 +173,8 @@ def clustering():
                         [
                             file_name[:3].replace("_", ""),
                             date,
-                            staying_up_late,
+                            staying_up_late_bed,
+                            staying_up_late_wake,
                             sum_step,
                             data_count
                         ]
@@ -133,51 +185,62 @@ def clustering():
         "all_data/2d_clustering_step_data.csv", low_memory=False)
 
     # 2d_kmeansの実行
-    model_2d_kmeans = KMeans(n_clusters=3).fit(df_step.iloc[:, -2:])
+    model_2d_kmeans = KMeans(
+        n_clusters=3, random_state=2).fit(df_step.iloc[:, -2:])
     # 1d_kmeansの実行(1dを強引に2dに)
-    sumValue_1d_kmeans = KMeans(n_clusters=3).fit(
-        df_step.iloc[:, 3].values.reshape(-1, 1))
-    valueCount_1d_kmeans = KMeans(n_clusters=3).fit(
+    sumValue_1d_kmeans = KMeans(n_clusters=3, random_state=2).fit(
         df_step.iloc[:, 4].values.reshape(-1, 1))
+    valueCount_1d_kmeans = KMeans(n_clusters=3, random_state=2).fit(
+        df_step.iloc[:, 5].values.reshape(-1, 1))
 
-    print("---2d_kmeans---")
-    print(model_2d_kmeans.labels_)  # 0 or 1でラベルずけ
-    print(model_2d_kmeans.cluster_centers_)  # クラスターの中心
-    print("---sumValue_1d_kmeans---")
-    print(sumValue_1d_kmeans.labels_)  # 0 or 1でラベルずけ
-    print(sumValue_1d_kmeans.cluster_centers_)  # クラスターの中心
-    print("---valueCount_1d_kmeans---")
-    print(valueCount_1d_kmeans.labels_)  # 0 or 1でラベルずけ
-    print(valueCount_1d_kmeans.cluster_centers_)  # クラスターの中心
+    # print("---2d_kmeans---")
+    # print(model_2d_kmeans.labels_)  # 0 or 1でラベルずけ
+    # print(model_2d_kmeans.cluster_centers_)  # クラスターの中心
+    # print("---sumValue_1d_kmeans---")
+    # print(sumValue_1d_kmeans.labels_)  # 0 or 1でラベルずけ
+    # print(sumValue_1d_kmeans.cluster_centers_)  # クラスターの中心
+    # print("---valueCount_1d_kmeans---")
+    # print(valueCount_1d_kmeans.labels_)  # 0 or 1でラベルずけ
+    # print(valueCount_1d_kmeans.cluster_centers_)  # クラスターの中心
 
     # クラスタリングのラベルをファイルに格納
 
-    for pass_name in clustering_label_pass:
-        file = open(f"all_data/{pass_name}.txt", "w")
-        for d in (model_2d_kmeans.labels_):
-            file.write(f"{d} ")
-        file.close()
+    # for pass_name in clustering_label_pass:
+    #     file = open(f"all_data/{pass_name}.txt", "w")
+    #     for d in (model_2d_kmeans.labels_):
+    #         file.write(f"{d} ")
+    #     file.close()
+
+    # 各ラベルを画像に出力
 
     plt.figure(figsize=(6, 6))
-    plt.scatter(df_step.iloc[:, 3], df_step.iloc[:, 4],
+    plt.scatter(df_step.iloc[:, 4], df_step.iloc[:, 5],
                 c=model_2d_kmeans.labels_, s=50)
-    plt.xlabel(df_step.columns[3])
-    plt.ylabel(df_step.columns[4])
+    plt.xlabel(df_step.columns[4])
+    plt.ylabel(df_step.columns[5])
     plt.savefig(f"all_data/{clustering_label_pass[0]}.png")
-
-    plt.figure(figsize=(6, 4))
-    plt.scatter(df_step.iloc[:, 3].values.reshape(-1, 1),
-                np.zeros_like(df_step.iloc[:, 3].values.reshape(-1, 1)),
-                c=sumValue_1d_kmeans.labels_, s=50)
-    plt.xlabel(df_step.columns[3])
-    plt.savefig(f"all_data/{clustering_label_pass[1]}.png")
 
     plt.figure(figsize=(6, 4))
     plt.scatter(df_step.iloc[:, 4].values.reshape(-1, 1),
                 np.zeros_like(df_step.iloc[:, 4].values.reshape(-1, 1)),
-                c=valueCount_1d_kmeans.labels_, s=50)
+                c=sumValue_1d_kmeans.labels_, s=50)
     plt.xlabel(df_step.columns[4])
+    plt.savefig(f"all_data/{clustering_label_pass[1]}.png")
+
+    plt.figure(figsize=(6, 4))
+    plt.scatter(df_step.iloc[:, 5].values.reshape(-1, 1),
+                np.zeros_like(df_step.iloc[:, 5].values.reshape(-1, 1)),
+                c=valueCount_1d_kmeans.labels_, s=50)
+    plt.xlabel(df_step.columns[5])
     plt.savefig(f"all_data/{clustering_label_pass[2]}.png")
+
+    # 各ラベルをcsvに追加
+
+    df_step["2dClusteringLabel"] = model_2d_kmeans.labels_
+    df_step["sumValueClusteringLabel"] = sumValue_1d_kmeans.labels_
+    df_step["valueCountClusteringLabel"] = valueCount_1d_kmeans.labels_
+
+    df_step.to_csv("all_data/2d_clustering_step_data.csv", index=False)
 
 
 # csvファイルを初期化
@@ -186,7 +249,7 @@ def clustering():
 def resetData():
     with open("all_data/2d_clustering_step_data.csv", mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["id", "date", "stayingUpLate",
+        writer.writerow(["id", "date", "stayingUpLateBed", "stayingUpLateWake",
                         "sumValue", "valueCount"])
 
     for pass_name in clustering_label_pass:

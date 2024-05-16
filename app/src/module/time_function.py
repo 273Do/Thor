@@ -78,7 +78,7 @@ def subtract_time(time_str1, time_str2):
     result_time = time1 - (time2 - datetime(1900, 1, 1))
 
     # 結果を文字列に変換して返す
-    print(time_str1, time_str2, result_time)
+    # print(time_str1, time_str2, result_time)
     return result_time.strftime('%H:%M:%S')
 
 # 時間の中央値を求める関数

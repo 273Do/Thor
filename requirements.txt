@@ -1,8 +1,9 @@
 # 便利ツール
 # pip-review
 # tqdm
-# joblib
+joblib
 jupyterlab
+imbalanced-learn
 
 # 分析系
 pandas

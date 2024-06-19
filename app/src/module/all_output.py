@@ -147,10 +147,16 @@ def dataCategorization():
         "extraction_data/z_all_output/all_preliminary_data.csv")
 
     # 使用できるデータを抽出
-    available_laststep_data_df = df[(df['mode'] == "Around") & (
-        df['last_step'] != "NoData")]
-    available_firststep_data_df = df[(df['mode'] == "Around") & (
-        df['first_step'] != "NoData")]
+    available_laststep_data_df = df[(df['mode'] == "Median")]
+    available_firststep_data_df = df[(df['mode'] == "Median")]
+    # available_laststep_data_df = df[(df['mode'] == "Median") & (
+    #     df['last_step'] != "NoData")]
+    # available_firststep_data_df = df[(df['mode'] == "Median") & (
+    #     df['first_step'] != "NoData")]
+    # available_laststep_data_df = df[(df['mode'] == "Around") & (
+    #     df['last_step'] != "NoData")]
+    # available_firststep_data_df = df[(df['mode'] == "Around") & (
+    #     df['first_step'] != "NoData")]
 
     # 被験者の回答ごとにリストに間時間を格納していく
     for survey_data in survey_list:
@@ -176,9 +182,13 @@ def dataCategorization():
                 # print("就寝間時間，起床間時間の平均値を求める")
                 #  全被験者の間時間の平均値を求める方法
                 available_laststep_data = available_laststep_data_df[available_laststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
-                    datetime.strptime(shift_time(row['last_step'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                    datetime.strptime(shift_time(row['estimate_bed'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
                 available_firststep_data = available_firststep_data_df[available_firststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
-                    datetime.strptime(shift_time(row['first_step'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                    datetime.strptime(shift_time(row['estimate_wake'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                # available_laststep_data = available_laststep_data_df[available_laststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
+                #     datetime.strptime(shift_time(row['last_step'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                # available_firststep_data = available_firststep_data_df[available_firststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
+                #     datetime.strptime(shift_time(row['first_step'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
                 # print(f"{survey_data}：「{answer}」の間就寝時間の平均値：", format(np.mean(
                 # available_laststep_data), ".0f"))
                 # print(f"{survey_data}：「{answer}」の間起床時間の平均値：", format(np.mean(
@@ -190,7 +200,9 @@ def dataCategorization():
             elif ((survey_data == "survey_1") or (survey_data == "survey_2") or (survey_data == "survey_3")):
                 # print("就寝間時間の平均値を求める")
                 available_laststep_data = available_laststep_data_df[available_laststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
-                    datetime.strptime(shift_time(row['last_step'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                    datetime.strptime(shift_time(row['estimate_bed'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                # available_laststep_data = available_laststep_data_df[available_laststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
+                #     datetime.strptime(shift_time(row['last_step'], row['actual_bed'])[1], "%H:%M").strftime("%H:%M")), axis=1)
                 # print(f"{survey_data}：「{answer}」の間就寝時間の平均値：", format(np.mean(
                 # available_laststep_data), ".0f"))
                 if (len(available_laststep_data) > 0):
@@ -199,7 +211,9 @@ def dataCategorization():
             else:
                 # print("起床間時間の平均値を求める")
                 available_firststep_data = available_firststep_data_df[available_firststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
-                    datetime.strptime(shift_time(row['first_step'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                    datetime.strptime(shift_time(row['estimate_wake'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
+                # available_firststep_data = available_firststep_data_df[available_firststep_data_df['id'].isin(ids_to_filter)] .apply(lambda row: time_to_minutes(
+                #     datetime.strptime(shift_time(row['first_step'], row['actual_wake'])[1], "%H:%M").strftime("%H:%M")), axis=1)
                 # print(f"{survey_data}：「{answer}」の間起床時間の平均値：", format(np.mean(
                 # available_firststep_data), ".0f"))
                 if (len(available_firststep_data) > 0):

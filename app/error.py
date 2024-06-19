@@ -22,7 +22,7 @@ if (mode == "error"):
         calculateError("")
 
     # 回答によるカテゴリー分け
-    dataCategorization()
+    # dataCategorization()
 
 
 elif (mode == "reset"):

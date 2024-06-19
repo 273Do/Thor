@@ -1,6 +1,7 @@
 import json
 import itertools
 import numpy as np
+import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
@@ -46,6 +47,10 @@ def dataVisualization(mode, subject_data):
 
     previous_day_bed = None  # 前日の就寝時間を格納する変数(日を跨がない場合)
 
+    # with open("all_data/actual_sleep_label.csv", mode='a+', newline='') as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(["id", "date", "sleep_label", "actual_bed",
+    #                      "actual_wake"])
     # 各行に対して、startDate から endDate の範囲を1に設定
     for i, date in enumerate(unique_dates):
         raw_time_data = [[], []]
@@ -112,9 +117,42 @@ def dataVisualization(mode, subject_data):
         # print(f"{raw_time_data[1]}") #max:wake
 
             allOutput.actual_sleep_data[date] = actual_time_data
+
+            # start_indexが3時移行の場合は1とする．そうでない場合は0とする
+            # print("actual_sleep_data", date, actual_time_data[0])
+            print(date)
+            sleep_label = 0
+            if ((pd.to_datetime('03:00', format='%H:%M').time() <= pd.to_datetime(actual_time_data[0], format='%H:%M').time())
+                    & (pd.to_datetime('21:00', format='%H:%M').time() >= pd.to_datetime(actual_time_data[0], format='%H:%M').time())):
+                print("3時以降", 1)
+                print(pd.to_datetime(
+                    actual_time_data[0], format='%H:%M').time())
+                sleep_label = 1
+            else:
+                print("3時以前", 0)
+                print(pd.to_datetime(
+                    actual_time_data[0], format='%H:%M').time())
+
+                # 01のデータをcsvに書き込み
+            with open("all_data/actual_sleep_label.csv", mode='a+', newline='') as file:
+                writer = csv.writer(file)
+                # writer.writerow(["id", "date", "sleep_label", "actual_bed",
+                #      "actual_wake"])
+                writer.writerow(
+                    [
+                        subject_data[0],
+                        date,
+                        sleep_label,
+                        actual_time_data[0],
+                        actual_time_data[1],
+                    ]
+                )
+
+            # 日付と01，時刻のデータを保存
+
             # print(date,allOutput.actual_sleep_data[date])
-        print("actual_sleep_data")
-        print(allOutput.actual_sleep_data)
+        # print("actual_sleep_data")
+        # print(allOutput.actual_sleep_data)
 
         # 就寝時刻から遡って最初に観測されるステップの時刻を格納
         # 起床時刻から最初に観測されるステップの時刻を格納
@@ -168,7 +206,6 @@ def dataVisualization(mode, subject_data):
                 if (last_step == "NoData"):
                     print("最後のステップ", last_step)
                 else:
-                    # print("最後のステップaaaa：", last_step)
                     print("最後のステップ：", last_step.strftime("%H:%M"))
                     last_step = last_step.strftime("%H:%M")
 

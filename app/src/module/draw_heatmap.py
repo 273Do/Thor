@@ -60,10 +60,10 @@ def confusionMatrixHeatmap(confusion_matrix, method, data_info, subject_data, co
     # plt.title(f'Estimation Sleep ({method})')
     plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.xticks(ticks=[0, 1], labels=['Positive', 'Negative'])
-    plt.yticks(ticks=[0, 1], labels=['Positive', 'Negative'])
+    plt.xlabel('Predicted label')
+    plt.ylabel('True label')
+    plt.xticks(ticks=[0, 1], labels=[0, 1])
+    plt.yticks(ticks=[0, 1], labels=[0, 1])
 
     for i in range(2):
         for j in range(2):

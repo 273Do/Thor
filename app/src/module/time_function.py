@@ -78,7 +78,7 @@ def subtract_time(time_str1, time_str2):
     result_time = time1 - (time2 - datetime(1900, 1, 1))
 
     # 結果を文字列に変換して返す
-    print(time_str1, time_str2, result_time)
+    # print(time_str1, time_str2, result_time)
     return result_time.strftime('%H:%M:%S')
 
 # 時間の中央値を求める関数
@@ -186,3 +186,11 @@ def shift_time(time_str1, time_str2):
     # print(time_str1, time_str2, formatted_time)
 
     return [shift, formatted_time]
+
+
+def timedelta_to_hhmmss(td):
+    total_seconds = int(td.total_seconds())
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+    return datetime.strptime(f"{hours:02}:{minutes:02}:{seconds:02}", "%H:%M:%S").time()

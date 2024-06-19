@@ -73,7 +73,12 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
                 file.write(f"{d} ")
             file.close()
         else:
-            print("extracted_pred_data書き込み", len(extracted_pred_data))
+            # print("extracted_pred_data書き込み", len(extracted_pred_data))
+            # file = open(
+            #     "extraction_data/z_all_output/all_extracted_actual_data.txt", "a")
+            # for d in (extracted_actual_data):
+            #     file.write(f"{d} ")
+            # file.close()
             file = open(
                 "extraction_data/z_all_output/all_extracted_median_pred_data.txt", "a")
             for d in (extracted_pred_data):
@@ -82,7 +87,7 @@ def evaluation_and_verification(actual_data_pass, pred_data_pass, method, subjec
 
         # 混同行列を出力
         cm = confusion_matrix(extracted_actual_data, extracted_pred_data, labels=[
-                              1, 0], normalize='true')
+                              0, 1], normalize='true')
         print("confusion_matrix")
         print(np.array(cm))
 
@@ -142,13 +147,17 @@ def allEvaluationAndVerification(survey_id):
     #                                   labels=[1, 0], normalize='true')
 
     if (survey_id == ""):
-        print("around=====================================")
+        print("Around=====================================")
         evaluate_predictions(actual_array, around_pred_array, "Around")
-        print("median=====================================")
+        print("Median=====================================")
         evaluate_predictions(actual_array, median_pred_array, "Median")
     else:
+        print("Around=====================================")
         evaluate_predictions(
             actual_array, around_pred_array, f"Around_{survey_id}")
+        print("Median=====================================")
+        evaluate_predictions(
+            actual_array, median_pred_array,  f"Median_{survey_id}")
         # 評価を行う関数
 
 
@@ -156,27 +165,27 @@ def evaluate_predictions(actual, pred, method):
 
     print("cm")
     cm = confusion_matrix(actual, pred,
-                          labels=[1, 0], normalize='true')
+                          labels=[0, 1], normalize='true')
     print(cm)
 
     # 正解率を出力
     accuracy = accuracy_score(actual, pred)
-    print("accuracy")
+    # print("accuracy")
     print(format(accuracy, ".2f"))
 
     # 適合率を出力
     precision = precision_score(actual, pred)
-    print("precision")
+    # print("precision")
     print(format(precision, ".2f"))
 
     # 再現率を出力
     recall = recall_score(actual, pred)
-    print("recall")
+    # print("recall")
     print(format(recall, ".2f"))
 
     # F値を出力
     f1_measure = f1_score(actual, pred)
-    print("f1_measure")
+    # print("f1_measure")
     print(format(f1_measure, ".2f"))
 
     # ヒートマップの描画
@@ -188,10 +197,10 @@ def evaluate_predictions(actual, pred, method):
     # plt.title(f'Estimation Sleep ({method})')
     plt.text(1.65, -0.55, data_info, fontsize=7)
     plt.colorbar(label='')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.xticks(ticks=[0, 1], labels=['Positive', 'Negative'])
-    plt.yticks(ticks=[0, 1], labels=['Positive', 'Negative'])
+    plt.xlabel('Predicted label')
+    plt.ylabel('True label')
+    plt.xticks(ticks=[0, 1], labels=[0, 1])
+    plt.yticks(ticks=[0, 1], labels=[0, 1])
 
     for i in range(2):
         for j in range(2):
@@ -208,7 +217,7 @@ def calculateError(survey_id):
     if (survey_id == ""):
         mode_list = ["Around", "Median"]
     else:
-        mode_list = ["Around"]
+        mode_list = ["Around", "Median"]
 
     df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv",
                      dtype={"sourceVersion": str, "device": str}, low_memory=False)
@@ -317,3 +326,11 @@ def dataReset():
     # 最初の行のみを含むDataFrameをCSVファイルに上書き保存
     first_row.to_csv(
         "extraction_data/z_all_output/all_output_data.csv", index=False)
+
+    sleep_label_df = pd.read_csv(
+        "all_data/actual_sleep_label.csv")
+    # 最初の行だけを取得
+    first_row = sleep_label_df.iloc[:0]
+    # 最初の行のみを含むDataFrameをCSVファイルに上書き保存
+    first_row.to_csv(
+        "all_data/actual_sleep_label.csv", index=False)

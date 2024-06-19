@@ -14,6 +14,13 @@ from src.module.time_function import ConvertToH, add_time
 
 # 数字四桁である場合は，0200->2，1030->10.5，2400->0に変換する
 # エラーハンドリング
+# test
+# [id, bed, wake] = ["KY", "0200", "1030"]
+# [id, bed, wake] = ["l12", "0200", "0900"]
+# [id, bed, wake] = ["o11", "0000", "0700"]
+# [id, bed, wake] = ["T01", "0100", "0600"]
+# ["T03", "0000", "0930"]
+# survey_id = "normal"
 
 # モードの設定ファイルを読み込む
 json_open = open('./src/settings.json', 'r')
@@ -32,8 +39,9 @@ survey_average_time = json.load(json_open)
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
 dataVisualization(mode["sleep"], [id, bed, wake])
-# sys.exit()
+
 dataVisualization(mode["step"], [id, bed, wake])
+# sys.exit()
 
 # 通常モード
 if (survey_id == "normal"):
@@ -44,7 +52,7 @@ if (survey_id == "normal"):
 
     # nhkの調査をもとに精査する方法
     estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
-        [94, 4], [94, 4]], survey_id, [id, bed, wake])
+        [94, 4], [94, 4]], survey_id, [id, bed, wake], True)
 
 elif (survey_id in survey_list):
 
@@ -77,22 +85,23 @@ elif (survey_id in survey_list):
         [ConvertToH(bed), ConvertToH(wake)], [2, 3]], correction, [id, bed, wake])
 
     # nhkの調査をもとに精査する方法
-    # estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
-    #     [94, 4], [94, 4]], mode_designation, [id, bed, wake])
+    estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
+        [94, 4], [94, 4]], correction, [id, bed, wake], True)
+    # sys.exit()
 
 elif (survey_id == "composite"):
     # アンケートの結果が最も良かったものを就寝時刻と起床時刻を選択
     # print("composite")
 
     correction = [survey_id]
-    most_survey_id = ["survey_0", "survey_6"]
+    most_survey_id = ["survey_3", "survey_4"]
 
     for i, survey_id in enumerate(most_survey_id):
         subjects_answers = survey_df[survey_df["id"]
                                      == id][survey_id].values[0]
         if i == 0:
             correction.append(
-                survey_average_time[survey_id][subjects_answers][1])
+                survey_average_time[survey_id][subjects_answers])
         else:
             correction.append(
                 survey_average_time[survey_id][subjects_answers])
@@ -101,6 +110,8 @@ elif (survey_id == "composite"):
     # sys.exit()
     estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
         [ConvertToH(bed), ConvertToH(wake)], [2, 3]], correction, [id, bed, wake])
+    estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
+        [94, 4], [94, 4]], correction, [id, bed, wake], True)
 
 else:
     print("適切なsurvey_idを入力してください")

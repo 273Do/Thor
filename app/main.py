@@ -54,6 +54,8 @@ if (survey_id == "normal"):
     estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
         [94, 4], [94, 4]], survey_id, [id, bed, wake], True)
 
+    # 個人のデータをもとに精査する方法
+
 elif (survey_id in survey_list):
 
     print(f"survey_id:{survey_id}")
@@ -101,10 +103,10 @@ elif (survey_id == "composite"):
                                      == id][survey_id].values[0]
         if i == 0:
             correction.append(
-                survey_average_time[survey_id][subjects_answers])
+                int(survey_average_time[survey_id][subjects_answers])*2)
         else:
             correction.append(
-                survey_average_time[survey_id][subjects_answers])
+                int(survey_average_time[survey_id][subjects_answers])*3/4)
 
     # print(correction)
     # sys.exit()

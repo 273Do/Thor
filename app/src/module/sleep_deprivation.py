@@ -12,6 +12,9 @@ final_result = "extraction_data/z_all_output/final_result.csv"
 actual_flg = []
 estimate_flg = []
 
+# pred_columns = ['q4_bed_estimate_datetime', 'q5_wake_estimate_datetime']
+pred_columns = ['estimate_bed', 'estimate_wake']
+
 
 def sleep_deprivation():
     print("sleep_deprivation")
@@ -24,34 +27,34 @@ def sleep_deprivation():
         df['actual_bed_datetime'])
     df['actual_wake_datetime'] = pd.to_datetime(
         df['actual_wake_datetime'])
-    df['q4_bed_estimate_datetime'] = pd.to_datetime(
-        df['q4_bed_estimate_datetime'])
-    df['q5_wake_estimate_datetime'] = pd.to_datetime(
-        df['q5_wake_estimate_datetime'])
+    df[pred_columns[0]] = pd.to_datetime(
+        df[pred_columns[0]])
+    df[pred_columns[1]] = pd.to_datetime(
+        df[pred_columns[1]])
 
     # idのリストを作成
     id_list = df["id"].unique()
     # print(id_list)
     for id in id_list:
 
-        id_df = df[df["id"] == id][["actual_bed_datetime", "actual_wake_datetime", "q4_bed_estimate_datetime",
-                                   "q5_wake_estimate_datetime"]]
+        id_df = df[df["id"] == id][["actual_bed_datetime",
+                                    "actual_wake_datetime", pred_columns[0], pred_columns[1]]]
 
         # print(id_df)
 
         # 就寝時刻の平均を求める
         # 実際
-        mean_a_bed = meanTime(id_df["actual_bed_datetime"])
+        mean_bed_a = meanTime(id_df["actual_bed_datetime"])
         # 推定
-        mean_q4_bed = meanTime(id_df["q4_bed_estimate_datetime"])
+        mean_bed_e = meanTime(id_df[pred_columns[0]])
 
         # 睡眠時間を求める
         # 実際
         sleep_a = sleepTime(id_df["actual_bed_datetime"],
                             id_df["actual_wake_datetime"])
         # 推定
-        sleep_e = sleepTime(id_df["q4_bed_estimate_datetime"],
-                            id_df["q5_wake_estimate_datetime"])
+        sleep_e = sleepTime(id_df[pred_columns[0]],
+                            id_df[pred_columns[1]])
         # 睡眠時間の平均を求める
         # 実際
         mean_sleep_a = meanTime(sleep_a)
@@ -61,9 +64,11 @@ def sleep_deprivation():
         # print(sleep_a)
         # 実際の値で異常検知
         sleepAnomalyDetection(
-            "actual", mean_a_bed, id_df["actual_bed_datetime"], mean_sleep_a, sleep_a)
+            "actual", mean_bed_a, id_df["actual_bed_datetime"], mean_sleep_a, sleep_a)
         sleepAnomalyDetection(
-            "estimate", mean_q4_bed, id_df["q4_bed_estimate_datetime"], mean_sleep_e, sleep_e)
+            "estimate", mean_bed_e, id_df[pred_columns[0]], mean_sleep_e, sleep_e)
+
+   # 結果の表示
     print("actual_flg")
     print(actual_flg)
     print("estimate_flg")
@@ -112,8 +117,6 @@ def sleep_deprivation():
 
     plt.savefig(
         f'extraction_data/sleep_deprivation_confusion_matrix.png')
-
-    # 結果の表示
 
 
 # 異常検知を行う関数

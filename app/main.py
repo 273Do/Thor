@@ -17,7 +17,7 @@ from src.module.time_function import ConvertToH, add_time
 # test
 # [id, bed, wake] = ["KY", "0200", "1030"]
 # [id, bed, wake] = ["l12", "0200", "0900"]
-# [id, bed, wake] = ["o11", "0000", "0700"]
+# [id, bed, wake] = ["o12", "0500", "1500"]
 # [id, bed, wake] = ["T01", "0100", "0600"]
 # ["T03", "0000", "0930"]
 # survey_id = "normal"
@@ -36,6 +36,11 @@ survey_df = pd.read_csv(
 json_open = open('extraction_data/z_all_output/data_categorization.json', 'r')
 survey_average_time = json.load(json_open)
 
+# 個人ごとのデータを取得
+individual_json = open(
+    'extraction_data/z_all_output/individual_ave.json', 'r')
+individual_data = json.load(individual_json)
+
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
 dataVisualization(mode["sleep"], [id, bed, wake])
@@ -45,7 +50,7 @@ dataVisualization(mode["step"], [id, bed, wake])
 
 # 通常モード
 if (survey_id == "normal"):
-
+    # print('normal')
     # 回答してもらった時刻をもとに精査する方法
     estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
         [ConvertToH(bed), ConvertToH(wake)], [2, 3]], survey_id, [id, bed, wake])
@@ -53,6 +58,8 @@ if (survey_id == "normal"):
     # nhkの調査をもとに精査する方法
     estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
         [94, 4], [94, 4]], survey_id, [id, bed, wake], True)
+
+    # 個人のデータをもとに精査する方法
 
 elif (survey_id in survey_list):
 
@@ -101,10 +108,10 @@ elif (survey_id == "composite"):
                                      == id][survey_id].values[0]
         if i == 0:
             correction.append(
-                survey_average_time[survey_id][subjects_answers])
+                int(survey_average_time[survey_id][subjects_answers]))  # *2
         else:
             correction.append(
-                survey_average_time[survey_id][subjects_answers])
+                int(survey_average_time[survey_id][subjects_answers]))  # *3/4
 
     # print(correction)
     # sys.exit()
@@ -112,7 +119,21 @@ elif (survey_id == "composite"):
         [ConvertToH(bed), ConvertToH(wake)], [2, 3]], correction, [id, bed, wake])
     estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
         [94, 4], [94, 4]], correction, [id, bed, wake], True)
+elif (survey_id == "individual"):
 
+    correction = [survey_id]
+    id_average = individual_data[id]
+    correction.append(id_average)
+    # print(correction)
+
+ # 回答してもらった時刻をもとに精査する方法
+    # corr_bed，corr_wakeには補正する時間を入力
+    estimateSleepFromStep_Around(mode["estimate_sleep_from_step"], [
+        [ConvertToH(bed), ConvertToH(wake)], [2, 3]], correction, [id, bed, wake])
+
+    # nhkの調査をもとに精査する方法
+    estimateSleepFromStep_Median([mode["estimate_sleep_from_step"], "percent"], [
+        [94, 4], [94, 4]], correction, [id, bed, wake], True)
 else:
     print("適切なsurvey_idを入力してください")
     sys.exit()

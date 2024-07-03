@@ -214,15 +214,15 @@ def evaluate_predictions(actual, pred, method):
 
 # all_output_data.csvから，二乗平均誤差と絶対平均誤差を計算する
 def calculateError(survey_id):
-    if (survey_id == ""):
-        mode_list = ["Around", "Median"]
-    else:
-        mode_list = ["Around", "Median"]
+    # if (survey_id == ""):
+    #     mode_list = ["Around", "Median"]
+    # else:
+    #     mode_list = ["Around", "Median"]
 
     df = pd.read_csv("extraction_data/z_all_output/all_output_data.csv",
                      dtype={"sourceVersion": str, "device": str}, low_memory=False)
 
-    for mode in mode_list:
+    for mode in ["Around", "Median"]:
         mode_df = df[df["mode"] == mode]
 
         print(f"{mode}=====================================")

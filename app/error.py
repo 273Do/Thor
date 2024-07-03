@@ -8,7 +8,7 @@ from src.module.time_function import shift_time
 
 # 質問リスト
 survey_list = ["survey_0", "survey_1", "survey_2",
-               "survey_3", "survey_4", "survey_5", "survey_6", "composite"]
+               "survey_3", "survey_4", "survey_5", "survey_6", "composite", "individual"]
 
 if (mode == "error"):
 

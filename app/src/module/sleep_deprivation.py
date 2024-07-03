@@ -7,13 +7,17 @@ from matplotlib.colors import ListedColormap
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 # from src.module.draw_heatmap import confusionMatrixHeatmap
 
-final_result = "extraction_data/z_all_output/final_result.csv"
+# final_result = "extraction_data/z_all_output/final_result.csv"
+final_result = "extraction_data/z_all_output/all_output_data.csv"
+
 
 actual_flg = []
 estimate_flg = []
 
 # pred_columns = ['q4_bed_estimate_datetime', 'q5_wake_estimate_datetime']
 pred_columns = ['estimate_bed', 'estimate_wake']
+# actual_columns = [actual_columns[0], actual_columns[1]]
+actual_columns = ['actual_bed', 'actual_wake']
 
 
 def sleep_deprivation():
@@ -22,11 +26,13 @@ def sleep_deprivation():
     # データの読み込み
     df = pd.read_csv(final_result, low_memory=False)
 
+    df = df[df["mode"] == 'Median']
+
     # 時間型に変換
-    df['actual_bed_datetime'] = pd.to_datetime(
-        df['actual_bed_datetime'])
-    df['actual_wake_datetime'] = pd.to_datetime(
-        df['actual_wake_datetime'])
+    df[actual_columns[0]] = pd.to_datetime(
+        df[actual_columns[0]])
+    df[actual_columns[1]] = pd.to_datetime(
+        df[actual_columns[1]])
     df[pred_columns[0]] = pd.to_datetime(
         df[pred_columns[0]])
     df[pred_columns[1]] = pd.to_datetime(
@@ -37,21 +43,21 @@ def sleep_deprivation():
     # print(id_list)
     for id in id_list:
 
-        id_df = df[df["id"] == id][["actual_bed_datetime",
-                                    "actual_wake_datetime", pred_columns[0], pred_columns[1]]]
+        id_df = df[df["id"] == id][[actual_columns[0],
+                                    actual_columns[1], pred_columns[0], pred_columns[1]]]
 
         # print(id_df)
 
         # 就寝時刻の平均を求める
         # 実際
-        mean_bed_a = meanTime(id_df["actual_bed_datetime"])
+        mean_bed_a = meanTime(id_df[actual_columns[0]])
         # 推定
         mean_bed_e = meanTime(id_df[pred_columns[0]])
 
         # 睡眠時間を求める
         # 実際
-        sleep_a = sleepTime(id_df["actual_bed_datetime"],
-                            id_df["actual_wake_datetime"])
+        sleep_a = sleepTime(id_df[actual_columns[0]],
+                            id_df[actual_columns[1]])
         # 推定
         sleep_e = sleepTime(id_df[pred_columns[0]],
                             id_df[pred_columns[1]])
@@ -64,7 +70,7 @@ def sleep_deprivation():
         # print(sleep_a)
         # 実際の値で異常検知
         sleepAnomalyDetection(
-            "actual", mean_bed_a, id_df["actual_bed_datetime"], mean_sleep_a, sleep_a)
+            "actual", mean_bed_a, id_df[actual_columns[0]], mean_sleep_a, sleep_a)
         sleepAnomalyDetection(
             "estimate", mean_bed_e, id_df[pred_columns[0]], mean_sleep_e, sleep_e)
 

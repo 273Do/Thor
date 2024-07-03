@@ -49,6 +49,10 @@ for file in *; do
         # 補正モード
         python3 main.py $id $bed $wake composite
         # exit 1
+    elif [ $survey_id = "individual" ]; then
+        # 個人補正モード
+        python3 main.py $id $bed $wake individual
+        # exit 1
     else
         echo "modeが不正です．"
         exit 1

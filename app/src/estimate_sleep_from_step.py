@@ -22,9 +22,10 @@ staying_up_late_time_pass = "./all_data/2d_clustering_step_data.csv"
 allOutput.output_data = globals()
 
 # 質問リスト
-survey_list_bed = ["survey_0", "survey_1", "survey_2", "survey_3", "composite"]
+survey_list_bed = ["survey_0", "survey_1",
+                   "survey_2", "survey_3", "composite", "individual"]
 survey_list_wake = ["survey_0", "survey_4",
-                    "survey_5", "survey_6", "composite"]
+                    "survey_5", "survey_6", "composite", "individual"]
 
 # 平均就寝時間と平均起床時間の前後を精査して，歩数から睡眠を推定する関数
 
@@ -83,6 +84,15 @@ def estimateSleepFromStep_Around(mode, time_specified_data, correction, subject_
         is_skip = False
         end_tmp = 0
         estimate_index_array = []
+
+        # 個人の差の平均を使う場合，correctionのフォーマットを変更
+        if ((correction[0] == "individual") & (i == 0)):
+            cor_list = correction[1][f'{datetime.strptime(
+                f"{date}", "%Y-%m-%d").month}']
+            # print([correction[0]] + cor_list)
+            correction = [correction[0]] + cor_list
+            print(correction)
+        # sys.exit()
 
         # 統合データ用にオブジェクトへ格納
         allOutput.output_data.update({
@@ -360,6 +370,16 @@ def estimateSleepFromStep_Median(method, time_specified_data, correction, subjec
         set_bed_range = []
         set_wake_range = []
         estimate_index_array = []
+        # print(datetime.strptime(f"{date}", "%Y-%m-%d").month)
+
+        # 個人の差の平均を使う場合，correctionのフォーマットを変更
+        if ((correction[0] == "individual") & (i == 0)):
+            cor_list = correction[1][f'{datetime.strptime(
+                f"{date}", "%Y-%m-%d").month}']
+            # print([correction[0]] + cor_list)
+            correction = [correction[0]] + cor_list
+            print(correction)
+        # sys.exit()
 
         # 統合データ用にオブジェクトへ格納
         allOutput.output_data.update({
@@ -483,7 +503,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, correction, subjec
                     is_cross_day_ = False
                     if (len(previous_day_data_) > 0):
                         if ((isCorr == True) & (correction[0] in survey_list_bed)):
-                            is_cross_day_ = True
+                            # is_cross_day_ = True
                             # print("補正モード：直接補正する")
                             bed_time_corr = datetime.strptime(add_time(
                                 previous_day_data_['endDate'].max(), f"{minutes_to_time(correction[1])}:00"), "%H:%M:%S")
@@ -492,6 +512,13 @@ def estimateSleepFromStep_Median(method, time_specified_data, correction, subjec
                                         60 + bed_time_corr.minute) // 5
                             allOutput.output_data["estimate_bed"] = bed_time_corr.strftime(
                                 "%H:%M")
+                            # 補正した後の時間が00:00より前の場合はis_cross_day_をFalseにする
+                            # 後の場合はis_cross_day_をTrueにする
+                            if ((bed_time_corr > datetime.strptime("00:00", "%H:%M")) & (bed_time_corr < datetime.strptime("12:00", "%H:%M"))):
+                                is_cross_day_ = True
+                            else:
+                                is_cross_day_ = False
+
                         else:
                             # 前日のデータがある場合に前日のデータを取得精査してヒートマップの形式に変換
                             bed_time = int((previous_day_data_['endDate'].max(

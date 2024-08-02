@@ -5,6 +5,7 @@ import json
 import sys
 import pandas as pd
 from src.visualization import dataVisualization
+from src.smartphone_sleep import phone_data_visualization
 from src.estimate_sleep_from_step import estimateSleepFromStep_Around, estimateSleepFromStep_Median
 from src.module.time_function import ConvertToH, add_time
 
@@ -43,10 +44,12 @@ individual_data = json.load(individual_json)
 
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
-dataVisualization(mode["sleep"], [id, bed, wake])
+# dataVisualization(mode["sleep"], [id, bed, wake])
 
-dataVisualization(mode["step"], [id, bed, wake])
-# sys.exit()
+# dataVisualization(mode["step"], [id, bed, wake])
+
+phone_data_visualization(mode["sleep"], [id, bed, wake])
+sys.exit()
 
 # 通常モード
 if (survey_id == "normal"):

@@ -410,6 +410,7 @@ def estimateSleepFromStep_Median(method, time_specified_data, correction, subjec
             # print(True)
             print(date)
 
+            # 今回は理論値で実際に3時以降の日を1として夜更かしとする
             sleep_label = 0
             if (staying_up_late == True):
                 sleep_label = sleep_label_df[sleep_label_df["date"]

@@ -5,6 +5,7 @@ import json
 import sys
 import pandas as pd
 from src.visualization import dataVisualization
+from src.smartphone_sleep import phone_data_visualization
 from src.estimate_sleep_from_step import estimateSleepFromStep_Around, estimateSleepFromStep_Median
 from src.module.time_function import ConvertToH, add_time
 
@@ -46,6 +47,9 @@ individual_data = json.load(individual_json)
 dataVisualization(mode["sleep"], [id, bed, wake])
 
 dataVisualization(mode["step"], [id, bed, wake])
+
+# iPhoneの睡眠データの可視化
+# phone_data_visualization(mode["sleep"], [id, bed, wake])
 # sys.exit()
 
 # 通常モード

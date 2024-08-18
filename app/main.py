@@ -44,12 +44,13 @@ individual_data = json.load(individual_json)
 
 # 各モード共通
 # 睡眠と歩数の可視化(初期のみ実行)
-# dataVisualization(mode["sleep"], [id, bed, wake])
+dataVisualization(mode["sleep"], [id, bed, wake])
 
-# dataVisualization(mode["step"], [id, bed, wake])
+dataVisualization(mode["step"], [id, bed, wake])
 
-phone_data_visualization(mode["sleep"], [id, bed, wake])
-sys.exit()
+# iPhoneの睡眠データの可視化
+# phone_data_visualization(mode["sleep"], [id, bed, wake])
+# sys.exit()
 
 # 通常モード
 if (survey_id == "normal"):

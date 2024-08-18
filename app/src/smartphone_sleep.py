@@ -80,4 +80,5 @@ def phone_data_visualization(mode, subject_data):
     cbar.set_label(mode["color_bar"]["label"])
 
     # グラフを保存
-    plt.savefig(mode["metadata"]["image_name"] + subject_data[0] + "_sp.png")
+    plt.savefig(mode["metadata"]["image_name"] +
+                "_" + subject_data[0] + "_sp.png")
